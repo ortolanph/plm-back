@@ -1,9 +1,24 @@
 services:
-  postgres:
-    image: 'postgres:latest'
+  plm_database:
+    image: postgres
+    container_name: plm_database
+    restart: always
+    env_file:
+      - .env
     environment:
-      - 'POSTGRES_DB=mydatabase'
-      - 'POSTGRES_PASSWORD=secret'
-      - 'POSTGRES_USER=myuser'
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASS}
     ports:
-      - '5432'
+      - "${DATABASE_PORT}:5432"
+    #    volumes:
+    #      - cojofuidbdata
+    networks:
+      - plm_network
+
+#volumes:
+#  cojofuidbdata:
+
+networks:
+  plm_network:
+    driver: bridge

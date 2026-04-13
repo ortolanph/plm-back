@@ -1,3 +1,40 @@
+plm:
+  users:
+    admin_user: ${ADMIN_USER}
+    admin_pass: ${ADMIN_PASS}
+    common_user: ${COMMON_USER}
+    common_pass: ${COMMON_PASS}
+
+server:
+  port: 9094
+
 spring:
   application:
     name: Personal Loan Manager - Backend
+    version: 1.0.0
+    title: Personal Loan Manager - Backend
+  banner:
+    location: banner.txt
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?autosave=always&reWriteBatchedInserts=true
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASS}
+  jpa:
+    show-sql: false
+    generate-ddl: false
+    hibernate:
+      use-new-id-generator-mappings: true
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          batch_size: 10
+        order_inserts: true
+        order_updates: true
+  flyway:
+    enabled: true
+    validate-on-migrate: true
+    locations: classpath:db/migration
