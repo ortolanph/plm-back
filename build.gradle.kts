@@ -7,14 +7,12 @@ plugins {
 group = "pt.pauloortolan"
 version = "0.0.1-SNAPSHOT"
 
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(25)
-	}
-}
-
 repositories {
 	mavenCentral()
+}
+
+tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+	mainClass.set("pt.pauloortolan.plm_back.PlmBackApplication")
 }
 
 dependencies {

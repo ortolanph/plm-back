@@ -5,6 +5,7 @@ import lombok.extern.slf4j.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pt.pauloortolan.plm_back.dto.GenerateResponse;
 import pt.pauloortolan.plm_back.model.GeneratedCode;
 import pt.pauloortolan.plm_back.repository.GeneratedCodeRepository;
 
@@ -40,13 +41,13 @@ public class CodeService {
         }
 
         GeneratedCode entity = new GeneratedCode(code, email);
-        repository.save(entity);
+        entity = repository.save(entity);
 
-        return new GenerateResponse(code, email);
+        return new GenerateResponse(entity.getCode(), entity.getEmail());
     }
 
     @Transactional(readOnly = true)
-    public ValidateResponse validateCode(String code, String email) {
+    public pt.pauloortolan.plm_back.dto.ValidateResponse validateCode(String code, String email) {
         log.info("CodeService::validateCode(code={}, email={})", code, email);
         return repository.findByCodeAndEmail(code, email)
                 .map(entity -> {
@@ -55,11 +56,11 @@ public class CodeService {
                     boolean expired = LocalDateTime.now().isAfter(expiryTime);
 
                     if (expired) {
-                        return new ValidateResponse(false, "Code expired");
+                        return new pt.pauloortolan.plm_back.dto.ValidateResponse(false, "Code expired");
                     }
-                    return new ValidateResponse(true, "Code valid");
+                    return new pt.pauloortolan.plm_back.dto.ValidateResponse(true, "Code valid");
                 })
-                .orElse(new ValidateResponse(false, "Code invalid"));
+                .orElse(new pt.pauloortolan.plm_back.dto.ValidateResponse(false, "Code invalid"));
     }
 
     @Transactional
@@ -72,8 +73,4 @@ public class CodeService {
             log.info("Purged {} expired codes", deleted);
         }
     }
-
-    public record GenerateResponse(String code, String email) {}
-
-    public record ValidateResponse(boolean valid, String message) {}
 }

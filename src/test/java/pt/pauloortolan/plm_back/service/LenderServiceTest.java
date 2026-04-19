@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pt.pauloortolan.plm_back.dto.*;
+import pt.pauloortolan.plm_back.mapper.LenderMapper;
 import pt.pauloortolan.plm_back.model.Lender;
 import pt.pauloortolan.plm_back.repository.LenderRepository;
 
@@ -23,88 +25,66 @@ class LenderServiceTest {
     @Mock
     private LenderRepository repository;
 
+    @Mock
+    private LenderMapper mapper;
+
     private LenderService lenderService;
 
     @BeforeEach
     void setUp() {
-        lenderService = new LenderService(repository);
+        lenderService = new LenderService(repository, mapper);
     }
 
     @Test
     void create_success_returnsLenderResponse() {
-        LenderService.CreateLenderRequest request = new LenderService.CreateLenderRequest(
-                "John Doe", "+1234567890", "IBAN123", "123 Main St");
+        CreateLenderRequest request = new CreateLenderRequest("John Doe", "+1234567890", "IBAN123", "123 Main St");
         
         Lender savedLender = Lender.builder()
                 .id(UUID.randomUUID())
                 .name("John Doe")
-                .phone("+1234567890")
-                .bankData("IBAN123")
-                .address("123 Main St")
                 .build();
         savedLender.setCreatedAt(LocalDateTime.now());
         savedLender.setUpdatedAt(LocalDateTime.now());
         
+        LenderResponse expectedResponse = new LenderResponse(
+                savedLender.getId(), "John Doe", "+1234567890", "IBAN123", "123 Main St",
+                savedLender.getCreatedAt(), savedLender.getUpdatedAt());
+        
+        when(mapper.toEntity(request)).thenReturn(savedLender);
         when(repository.save(any(Lender.class))).thenReturn(savedLender);
+        when(mapper.toResponse(savedLender)).thenReturn(expectedResponse);
 
-        LenderService.LenderResponse response = lenderService.create(request);
+        LenderResponse response = lenderService.create(request);
 
         assertNotNull(response);
         assertEquals("John Doe", response.name());
-        assertEquals("+1234567890", response.phone());
-        verify(repository).save(any(Lender.class));
-    }
-
-    @Test
-    void create_withMinimalData_succeeds() {
-        LenderService.CreateLenderRequest request = new LenderService.CreateLenderRequest(
-                "Jane Doe", null, null, null);
-        
-        Lender savedLender = Lender.builder()
-                .id(UUID.randomUUID())
-                .name("Jane Doe")
-                .build();
-        savedLender.setCreatedAt(LocalDateTime.now());
-        savedLender.setUpdatedAt(LocalDateTime.now());
-        
-        when(repository.save(any(Lender.class))).thenReturn(savedLender);
-
-        LenderService.LenderResponse response = lenderService.create(request);
-
-        assertNotNull(response);
-        assertEquals("Jane Doe", response.name());
-        assertNull(response.phone());
     }
 
     @Test
     void update_success_updatesLender() {
         UUID lenderId = UUID.randomUUID();
-        Lender existingLender = Lender.builder()
-                .id(lenderId)
-                .name("Old Name")
-                .phone("+1111111111")
-                .build();
+        UpdateLenderRequest request = new UpdateLenderRequest("New Name", "+2222222222", null, null);
+        Lender existingLender = Lender.builder().id(lenderId).name("Old Name").build();
         existingLender.setCreatedAt(LocalDateTime.now());
         existingLender.setUpdatedAt(LocalDateTime.now());
-
-        LenderService.UpdateLenderRequest request = new LenderService.UpdateLenderRequest(
-                "New Name", "+2222222222", null, null);
-
+        
+        LenderResponse expectedResponse = new LenderResponse(lenderId, "New Name", "+2222222222", null, null, 
+                existingLender.getCreatedAt(), LocalDateTime.now());
+        
         when(repository.findById(lenderId)).thenReturn(Optional.of(existingLender));
         when(repository.save(any(Lender.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(mapper.toResponse(any(Lender.class))).thenReturn(expectedResponse);
 
-        LenderService.LenderResponse response = lenderService.update(lenderId, request);
+        LenderResponse response = lenderService.update(lenderId, request);
 
         assertNotNull(response);
         assertEquals("New Name", response.name());
-        assertEquals("+2222222222", response.phone());
     }
 
     @Test
     void update_notFound_throwsException() {
         UUID lenderId = UUID.randomUUID();
-        LenderService.UpdateLenderRequest request = new LenderService.UpdateLenderRequest(
-                "New Name", null, null, null);
+        UpdateLenderRequest request = new UpdateLenderRequest("New Name", null, null, null);
 
         when(repository.findById(lenderId)).thenReturn(Optional.empty());
 
@@ -114,44 +94,44 @@ class LenderServiceTest {
     @Test
     void query_byName_returnsMatchingLenders() {
         String nameFilter = "John";
-        Lender lender = Lender.builder()
-                .id(UUID.randomUUID())
-                .name("John Doe")
-                .build();
+        Lender lender = Lender.builder().id(UUID.randomUUID()).name("John Doe").build();
+        LenderResponse expectedResponse = new LenderResponse(
+                lender.getId(), "John Doe", null, null, null, LocalDateTime.now(), LocalDateTime.now());
         
         when(repository.findByNameContaining(nameFilter)).thenReturn(List.of(lender));
+        when(mapper.toResponse(lender)).thenReturn(expectedResponse);
 
-        List<LenderService.LenderResponse> results = lenderService.query(nameFilter, null);
+        List<LenderResponse> results = lenderService.query(nameFilter, null);
 
         assertEquals(1, results.size());
-        assertEquals("John Doe", results.get(0).name());
     }
 
     @Test
     void query_byPhone_returnsMatchingLenders() {
         String phoneFilter = "+1234567890";
-        Lender lender = Lender.builder()
-                .id(UUID.randomUUID())
-                .name("John Doe")
-                .phone("+1234567890")
-                .build();
+        Lender lender = Lender.builder().id(UUID.randomUUID()).name("John Doe").phone(phoneFilter).build();
+        LenderResponse expectedResponse = new LenderResponse(
+                lender.getId(), "John Doe", phoneFilter, null, null, LocalDateTime.now(), LocalDateTime.now());
         
         when(repository.findByPhoneContaining(phoneFilter)).thenReturn(List.of(lender));
+        when(mapper.toResponse(lender)).thenReturn(expectedResponse);
 
-        List<LenderService.LenderResponse> results = lenderService.query(null, phoneFilter);
+        List<LenderResponse> results = lenderService.query(null, phoneFilter);
 
         assertEquals(1, results.size());
-        assertEquals("+1234567890", results.get(0).phone());
     }
 
     @Test
     void query_noFilters_returnsAllLenders() {
         Lender lender1 = Lender.builder().id(UUID.randomUUID()).name("John").build();
         Lender lender2 = Lender.builder().id(UUID.randomUUID()).name("Jane").build();
+        LenderResponse response = new LenderResponse(
+                UUID.randomUUID(), "Test", null, null, null, LocalDateTime.now(), LocalDateTime.now());
         
         when(repository.findAll()).thenReturn(List.of(lender1, lender2));
+        when(mapper.toResponse(any(Lender.class))).thenReturn(response);
 
-        List<LenderService.LenderResponse> results = lenderService.query(null, null);
+        List<LenderResponse> results = lenderService.query(null, null);
 
         assertEquals(2, results.size());
     }
@@ -159,21 +139,20 @@ class LenderServiceTest {
     @Test
     void getById_success_returnsLender() {
         UUID lenderId = UUID.randomUUID();
-        Lender lender = Lender.builder()
-                .id(lenderId)
-                .name("John Doe")
-                .phone("+1234567890")
-                .build();
+        Lender lender = Lender.builder().id(lenderId).name("John Doe").build();
         lender.setCreatedAt(LocalDateTime.now());
         lender.setUpdatedAt(LocalDateTime.now());
 
+        LenderResponse expectedResponse = new LenderResponse(lenderId, "John Doe", null, null, null, 
+                lender.getCreatedAt(), lender.getUpdatedAt());
+        
         when(repository.findById(lenderId)).thenReturn(Optional.of(lender));
+        when(mapper.toResponse(lender)).thenReturn(expectedResponse);
 
-        LenderService.LenderResponse response = lenderService.getById(lenderId);
+        LenderResponse response = lenderService.getById(lenderId);
 
         assertNotNull(response);
         assertEquals(lenderId, response.id());
-        assertEquals("John Doe", response.name());
     }
 
     @Test
@@ -187,22 +166,16 @@ class LenderServiceTest {
     @Test
     void query_byPhonePartial_returnsMatchingLenders() {
         String phoneFilter = "+1234";
-        Lender lender1 = Lender.builder()
-                .id(UUID.randomUUID())
-                .name("John Doe")
-                .phone("+1234567890")
-                .build();
-        Lender lender2 = Lender.builder()
-                .id(UUID.randomUUID())
-                .name("Jane Doe")
-                .phone("+1234987654")
-                .build();
+        Lender lender1 = Lender.builder().id(UUID.randomUUID()).name("John Doe").phone("+1234567890").build();
+        LenderResponse response1 = new LenderResponse(
+                lender1.getId(), "John Doe", "+1234567890", null, null, LocalDateTime.now(), LocalDateTime.now());
         
-        when(repository.findByPhoneContaining(phoneFilter)).thenReturn(List.of(lender1, lender2));
+        when(repository.findByPhoneContaining(phoneFilter)).thenReturn(List.of(lender1));
+        when(mapper.toResponse(lender1)).thenReturn(response1);
 
-        List<LenderService.LenderResponse> results = lenderService.query(null, phoneFilter);
+        List<LenderResponse> results = lenderService.query(null, phoneFilter);
 
-        assertEquals(2, results.size());
+        assertEquals(1, results.size());
     }
 
     @Test

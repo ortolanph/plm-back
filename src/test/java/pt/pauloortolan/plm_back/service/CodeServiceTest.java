@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pt.pauloortolan.plm_back.dto.*;
 import pt.pauloortolan.plm_back.model.GeneratedCode;
 import pt.pauloortolan.plm_back.repository.GeneratedCodeRepository;
 
@@ -35,7 +36,7 @@ class CodeServiceTest {
         when(repository.findByCodeAndEmail(anyString(), anyString())).thenReturn(Optional.empty());
         when(repository.save(any(GeneratedCode.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        CodeService.GenerateResponse response = codeService.generateCode(TEST_EMAIL);
+        GenerateResponse response = codeService.generateCode(TEST_EMAIL);
 
         assertNotNull(response);
         assertNotNull(response.code());
@@ -53,7 +54,7 @@ class CodeServiceTest {
                 .thenReturn(Optional.empty());
         when(repository.save(any(GeneratedCode.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        CodeService.GenerateResponse response = codeService.generateCode(TEST_EMAIL);
+        GenerateResponse response = codeService.generateCode(TEST_EMAIL);
 
         assertNotNull(response);
         verify(repository, atLeast(2)).findByCodeAndEmail(anyString(), anyString());
@@ -72,7 +73,7 @@ class CodeServiceTest {
         code.setCreatedAt(LocalDateTime.now());
         when(repository.findByCodeAndEmail("123456", TEST_EMAIL)).thenReturn(Optional.of(code));
 
-        CodeService.ValidateResponse response = codeService.validateCode("123456", TEST_EMAIL);
+        ValidateResponse response = codeService.validateCode("123456", TEST_EMAIL);
 
         assertTrue(response.valid());
         assertEquals("Code valid", response.message());
@@ -82,7 +83,7 @@ class CodeServiceTest {
     void validateCode_codeNotFound_returnsInvalid() {
         when(repository.findByCodeAndEmail("999999", TEST_EMAIL)).thenReturn(Optional.empty());
 
-        CodeService.ValidateResponse response = codeService.validateCode("999999", TEST_EMAIL);
+        ValidateResponse response = codeService.validateCode("999999", TEST_EMAIL);
 
         assertFalse(response.valid());
         assertEquals("Code invalid", response.message());
@@ -94,7 +95,7 @@ class CodeServiceTest {
         code.setCreatedAt(LocalDateTime.now().minusMinutes(6));
         when(repository.findByCodeAndEmail("123456", TEST_EMAIL)).thenReturn(Optional.of(code));
 
-        CodeService.ValidateResponse response = codeService.validateCode("123456", TEST_EMAIL);
+        ValidateResponse response = codeService.validateCode("123456", TEST_EMAIL);
 
         assertFalse(response.valid());
         assertEquals("Code expired", response.message());
