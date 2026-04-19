@@ -4,6 +4,10 @@ import lombok.*;
 import lombok.extern.slf4j.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pt.pauloortolan.plm_back.dto.CreateLenderRequest;
+import pt.pauloortolan.plm_back.dto.LenderResponse;
+import pt.pauloortolan.plm_back.dto.UpdateLenderRequest;
+import pt.pauloortolan.plm_back.mapper.LenderMapper;
 import pt.pauloortolan.plm_back.model.Lender;
 import pt.pauloortolan.plm_back.repository.LenderRepository;
 
@@ -16,18 +20,14 @@ import java.util.UUID;
 public class LenderService {
 
     private final LenderRepository repository;
+    private final LenderMapper mapper;
 
     @Transactional
     public LenderResponse create(CreateLenderRequest request) {
         log.info("LenderService::create(name={})", request.name());
-        Lender lender = Lender.builder()
-                .name(request.name())
-                .phone(request.phone())
-                .bankData(request.bankData())
-                .address(request.address())
-                .build();
+        Lender lender = mapper.toEntity(request);
         lender = repository.save(lender);
-        return toResponse(lender);
+        return mapper.toResponse(lender);
     }
 
     @Transactional
@@ -42,7 +42,7 @@ public class LenderService {
         if (request.address() != null) lender.setAddress(request.address());
         
         lender = repository.save(lender);
-        return toResponse(lender);
+        return mapper.toResponse(lender);
     }
 
     @Transactional(readOnly = true)
@@ -51,53 +51,28 @@ public class LenderService {
         
         if (name != null && phone != null) {
             return repository.findByFilters(name, phone).stream()
-                    .map(this::toResponse)
+                    .map(mapper::toResponse)
                     .toList();
         }
         if (name != null) {
             return repository.findByNameContaining(name).stream()
-                    .map(this::toResponse)
+                    .map(mapper::toResponse)
                     .toList();
         }
         if (phone != null) {
             return repository.findByPhoneContaining(phone).stream()
-                    .map(this::toResponse)
+                    .map(mapper::toResponse)
                     .toList();
         }
         return repository.findAll().stream()
-                .map(this::toResponse)
+                .map(mapper::toResponse)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public LenderResponse getById(UUID id) {
         return repository.findById(id)
-                .map(this::toResponse)
+                .map(mapper::toResponse)
                 .orElseThrow(() -> new IllegalArgumentException("Lender not found: " + id));
     }
-
-    private LenderResponse toResponse(Lender lender) {
-        return new LenderResponse(
-                lender.getId(),
-                lender.getName(),
-                lender.getPhone(),
-                lender.getBankData(),
-                lender.getAddress(),
-                lender.getCreatedAt(),
-                lender.getUpdatedAt()
-        );
-    }
-
-    public record CreateLenderRequest(String name, String phone, String bankData, String address) {}
-
-    public record UpdateLenderRequest(String name, String phone, String bankData, String address) {}
-
-    public record LenderResponse(
-            UUID id,
-            String name,
-            String phone,
-            String bankData,
-            String address,
-            java.time.LocalDateTime createdAt,
-            java.time.LocalDateTime updatedAt) {}
 }
