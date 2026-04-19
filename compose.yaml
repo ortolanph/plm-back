@@ -11,13 +11,11 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASS}
     ports:
       - "${DATABASE_PORT}:5432"
-    #    volumes:
-    #      - cojofuidbdata
     networks:
       - plm_network
 
-#volumes:
-#  cojofuidbdata:
+volumes:
+  plm_data:
 
 networks:
   plm_network:
