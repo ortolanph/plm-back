@@ -55,7 +55,7 @@ Lenders could be:
     5. No parameters   
 4. Erased   
     1. Only when all the transactions are paid in full or forgiven   
-5. Debt Settlement `(POST /lenders/{lenderId}/settle`)   
+5. Debt Settlement `(POST /lenders/{lenderId}/settle/{settlementType}`)   
 6. List all the transactions `(GET /lenders/{lenderId}/transactions`)   
 7. List the lender history`(GET /lenders/{lenderId}/history`)   
 8. Summary (total debt + transactions + history) `(GET /lenders/{lenderId}/summary`)   
@@ -287,7 +287,7 @@ History data is:
    
    
 ## Reports   
-Generate CSV, Excel, and PDF reports.   
+Generate CSV, HTML, Excel, and PDF reports.   
    
 Root Endpoint:` /reports`    
    
@@ -343,7 +343,7 @@ Workbook Structure:
 ### PDF   
 Generates a summary PDF file of all data.   
    
-Root Endpoint: `/relatorios/pdf`    
+Root Endpoint: `/reports/pdf`    
    
 Parameters:   
 - No parameters   
@@ -358,25 +358,3 @@ PDF File Layout:
 1. Spring Boot   
 2. Spring Boot JPA   
 3. PostGRESQL   
-   
-   
-Link to the project Github.   
-   
-## User Stories Division   
-   
-| **Story Id** | **Target** | **Description**                                 |
-|:------------:|:----------:|:------------------------------------------------|
-|   PLM0001    |  Backend   | LENDERS - Create, Update and Queries            |
-|   PLM0002    |  Backend   | TRANSACTIONS  - Creation and Queries            |
-|   PLM0003    |  Backend   | HISTORY - History Generation and Queries        |
-|   PLM0004    |  Backend   | DEBTS - Implementation                          |
-|   PLM0005    |  Backend   | LENDERS - Deletion                              |
-|   PLM0006    |  Backend   | HISTORY - Delete history records after one year |
-|   PLM0007    |  Backend   | LENDERS - Settle a Debt                         |
-|   PLM0008    |  Backend   | LENDERS - List of transactions                  |
-|   PLM0009    |  Backend   | LENDERS - History of a lender                   |
-|   PLM0010    |  Backend   | LENDERS - Summary                               |
-|   PLM0011    |  Backend   | REPORTS - CSV                                   |
-|   PLM0012    |  Backend   | REPORTS - EXCEL                                 |
-|   PLM0013    |  Backend   | REPORTS - PDF                                   |
-

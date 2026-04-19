@@ -4,7 +4,8 @@
 
 ### Requirement: Settle
 
-A settlement is when the user wants to end a debt with a lender. The lender remains, but all his transactions till the day of the settlement are moved from the transaction table.
+A settlement is when the user wants to end a debt of a lender. 
+The lender remains, but all his transactions till the day of the settlement are moved to the transaction table.
 
 ```
 *TRANSACTION_HISTORY*
@@ -30,10 +31,24 @@ For this requirement will be used **BORROWED**, **PAYMENT**, and **CANCELLED**.
 #### Scenario: Settle the debit
 
 - GIVEN the user wants to settle a debt with a given reason 
-- WHEN the user calls the `/lenders/{lenderId}/settle/{settlementType}`
+- WHEN the user calls the `/lenders/settle` endpoint informing the lenderId, the settlementType, and the paymentType
 - THEN the system retrieves the records of all the transactions with the lender
 - AND calculates the total
 - AND for each transaction records, compose the history record
 - AND saves into the history table
 - AND delete the transaction record
 - AND creates a final record with the total with the settlement type
+
+#### Scenario: Delete a lender
+
+- GIVEN the user wants to delete a lender
+- WHEN the user calls DELETE `/lenders/{lenderId}`
+- THEN the system will check if there is not open transaction to settle
+- AND the system deletes the lender
+
+#### Scenario: Delete a lender - Not Successful
+
+- GIVEN the user wants to delete a lender
+- WHEN the user calls DELETE `/lenders/{lenderId}`
+- THEN the system will check if there is open transactions to settle
+- AND the system does not delete the lender
