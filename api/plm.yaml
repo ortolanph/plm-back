@@ -5,9 +5,15 @@ info:
   description: |
     The Personal Lenders Manager backend API.
 
+servers:
+  - description: Local Server
+    url: http://localhost:9094/
+
 tags:
   - name: OTP
     description: OTP code generation and validation operations
+  - name: Lenders
+    description: Lender management operations
 
 paths:
   /codes/generate:
@@ -79,6 +85,109 @@ paths:
               schema:
                 $ref: '#/components/schemas/ValidateResponse'
 
+  /lenders:
+    post:
+      summary: Create a new lender
+      tags: [Lenders]
+      operationId: createLender
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLenderRequest'
+      responses:
+        '200':
+          description: Lender created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LenderResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+      summary: Query lenders
+      tags: [Lenders]
+      operationId: queryLenders
+      parameters:
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by name (partial match)
+        - name: phone
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by phone number
+      responses:
+        '200':
+          description: Lenders retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LenderResponse'
+
+  /lenders/{id}:
+    put:
+      summary: Update a lender
+      tags: [Lenders]
+      operationId: updateLender
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLenderRequest'
+      responses:
+        '200':
+          description: Lender updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LenderResponse'
+
+    get:
+      summary: Get a lender by ID
+      tags: [Lenders]
+      operationId: getLenderById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Lender retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LenderResponse'
+        '404':
+          description: Lender not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   schemas:
     GenerateResponse:
@@ -102,9 +211,66 @@ components:
           type: string
           description: Status message
           example: "Code valid"
+    CreateLenderRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Lender name
+          example: "John Doe"
+        phone:
+          type: string
+          description: Lender phone number
+          example: "+1234567890"
+        bankData:
+          type: string
+          description: Bank account information
+          example: "IBAN: XX12..."
+        address:
+          type: string
+          description: Lender address
+          example: "123 Main St"
+
+    UpdateLenderRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+        bankData:
+          type: string
+        address:
+          type: string
+
+    LenderResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Lender unique identifier
+        name:
+          type: string
+        phone:
+          type: string
+        bankData:
+          type: string
+        address:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
     ErrorResponse:
       type: object
       properties:
         error:
           type: string
           description: Error description
+
