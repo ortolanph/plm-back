@@ -1,0 +1,110 @@
+openapi: 3.1.1
+info:
+  title: PLM API
+  version: 1.0.0
+  description: |
+    The Personal Lenders Manager backend API.
+
+tags:
+  - name: OTP
+    description: OTP code generation and validation operations
+
+paths:
+  /codes/generate:
+    post:
+      summary: Generate a 6-digit OTP code
+      tags: [OTP]
+      operationId: generateCode
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "user@example.com"
+      responses:
+        '200':
+          description: Code generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /codes/validate:
+    post:
+      summary: Validate an OTP code
+      tags: [OTP]
+      operationId: validateCode
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+                - email
+              properties:
+                code:
+                  type: string
+                  pattern: '^\d{6}$'
+                  example: "123456"
+                email:
+                  type: string
+                  format: email
+                  example: "user@example.com"
+      responses:
+        '200':
+          description: Valid code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidateResponse'
+        '400':
+          description: Invalid or expired code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidateResponse'
+
+components:
+  schemas:
+    GenerateResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          description: The generated 6-digit code
+          example: "123456"
+        email:
+          type: string
+          description: The email associated with the code
+          example: "user@example.com"
+    ValidateResponse:
+      type: object
+      properties:
+        valid:
+          type: boolean
+          description: Whether the code is valid
+        message:
+          type: string
+          description: Status message
+          example: "Code valid"
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error description
