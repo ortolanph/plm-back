@@ -4,7 +4,7 @@
 
 ### Requirement: Transaction Management
 
-The system must be able to perform CRU Operations on Transactions object.
+The system must be able to perform operations on Transactions object.
 A Transaction is a record of financial situation. It's immutable. 
 It has the lender's id, the date when it happened, the value of the transaction, the type and how the transaction was paid.
 
