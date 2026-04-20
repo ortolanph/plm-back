@@ -28,13 +28,13 @@ For this requirement will be used **BORROWED**, **PAYMENT**, and **CANCELLED**.
 
 #### Scenario: Create BORROWED Transaction
 
-- GIVEN the user informs the lender's id, the value borrowed
+- GIVEN the user informs the lender's id, the value borrowed, and the payment type
 - WHEN there's a call to create a transaction
 - THEN the system creates a new transaction containing, the lender id, the date, the value, and the type BORROWED.
 
 #### Scenario: Create PAYED Transaction
 
-- GIVEN the user informs the lender's id, the value that was paid to the lender
+- GIVEN the user informs the lender's id, the value that was paid to the lender, and the payment type
 - WHEN there's a call to create a transaction
 - THEN the system creates a new transaction containing, the lender id, the date, the value, and the type PAYMENT.
 
@@ -44,8 +44,43 @@ For this requirement will be used **BORROWED**, **PAYMENT**, and **CANCELLED**.
 - WHEN there's a call to cancell a transaction
 - THEN the system creates a new transaction containing, the lender id, the date, the value of the correlated transaction, and the type CANCELLED
 
-#### Scenarion: Query Transactions
+#### Scenario: Query Transactions
 
-- GIVEN the use wants to query transactions by date or date interval or by value or value interval or by type or by a combination or no parameter at all
-- WHEN there's a call to query transactions
+- GIVEN the use wants to query transactions by date or date interval 
+- OR by value or value interval 
+- OR by type 
+- OR by a combination of parameters 
+- OR no parameter at all
+- WHEN there's a call to query transactions  on endpoint `/lenders/{lenderId}/transactions`
 - THEN the system retrieves the selected transactions or none
+
+Format:
+```
+{
+	"total": 200,
+	"lender": "John Doe",
+	"date": "CURRENT_DATE('DD/MM/YYYY HH:mm:SS')",
+	"transactions": [
+		{
+			"date": "DD/MM/YYYY",
+			"value": 100,
+			"type": "BORROWED"
+		},
+		{
+			"date": "DD/MM/YYYY",
+			"value": 50,
+			"type": "BORROWED"
+		},
+		{
+			"date": "DD/MM/YYYY",
+			"value": 50,
+			"type": "CANCELLED"
+		},
+		{
+			"date": "DD/MM/YYYY",
+			"value": 25
+			"type": "PAYMENT"
+		}
+	]
+}
+```

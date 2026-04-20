@@ -131,11 +131,8 @@ Format:
 		}
 	]
 }
-
-
-
-
 ```
+
 ### History of a Lender   
 ```
 {
@@ -159,8 +156,6 @@ Format:
 		}
 	]
 }
-
-
 ```
 ### Summary   
 ```
@@ -208,9 +203,6 @@ Format:
 		}
 	]
 }
-
-
-
 ```
 ## Transactions   
 The immutable record of money transactions.    
@@ -267,7 +259,6 @@ Format:
   }
  ]
 }
-
 ```
 ## History   
 Shows the historic data of transactions. History is kept for one year.   
@@ -306,7 +297,7 @@ Omitting the parameters means everything.
 Alternate endpoints:
 - `/reports/csv/transactions`
     - All or selected transactions
-    - File name:` transactions_DDMMYYYY_HHmmSS.csv`
+    - File name:` transactions_DDMMYYYY_HHmmSS_lender_name.csv`
     - Header and Layout: `lender_name,transaction_date,transaction_name,transaction_type,transaction_value,transaction_payment_type`    
 - `/reports/csv/history`
     - All or selected transactions

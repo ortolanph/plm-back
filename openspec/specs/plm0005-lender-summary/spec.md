@@ -1,0 +1,61 @@
+# Lender Summary
+
+## ADDED Requirements
+
+### Requirement: Lender Summary
+
+The system must be able to query the summary of a lender with the transactions and the history.
+
+#### Scenario: Summary
+
+- GIVEN the use wants to create a summary report in JSON format
+- WHEN there's a call to query history data on endpoint `/lenders/{lenderId}/summary`
+- THEN the system generates the report
+
+Format
+```
+{
+	"total": 200,
+	"lender": "John Doe",
+	"date": "CURRENT_DATE('DD/MM/YYYY HH:mm:SS')",
+	"transactions": [
+		{
+			"date": "DD/MM/YYYY",
+			"value": 100,
+			"type": "BORROWED"
+		},
+		{
+			"date": "DD/MM/YYYY",
+			"value": 50,
+			"type": "BORROWED"
+		},
+		{
+			"date": "DD/MM/YYYY",
+			"value": 50,
+			"type": "CANCELLED"
+		},
+		{
+			"date": "DD/MM/YYYY",
+			"value": 200,
+			"type": "BORROWED"
+		}
+	],
+	"history": [
+		{
+			"date": "DD/MM/YYYY",
+			"value": 100,
+			"type": "BORROWED"
+		},
+		{
+			"date": "DD/MM/YYYY",
+			"value": 200,
+			"type": "BORROWED"
+		},
+		{
+			"date": "DD/MM/YYYY",
+			"value": 300,
+			"type": "PAID_IN_FULL"
+		}
+	]
+}
+```

@@ -1,4 +1,4 @@
-# Settle a Payment - Basic
+# Settle a Debt
 
 ## ADDED Requirements
 
@@ -43,12 +43,12 @@ For this requirement will be used **BORROWED**, **PAYMENT**, and **CANCELLED**.
 
 - GIVEN the user wants to delete a lender
 - WHEN the user calls DELETE `/lenders/{lenderId}`
-- THEN the system will check if there is not open transaction to settle
+- THEN the system will check if there is no open transaction to settle
 - AND the system deletes the lender
 
 #### Scenario: Delete a lender - Not Successful
 
 - GIVEN the user wants to delete a lender
 - WHEN the user calls DELETE `/lenders/{lenderId}`
-- THEN the system will check if there is open transactions to settle
+- THEN the system will check if there are open transactions to settle
 - AND the system does not delete the lender
