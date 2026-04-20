@@ -1,0 +1,68 @@
+### Create a Lender
+POST {{baseUrl}}/lenders
+Content-Type: application/json
+
+{
+  "name": "Alice",
+  "email": "alice@example.com"
+}
+
+> {%
+    client.variables.set("lenderId", response.body.id);
+%}
+
+### Create transaction #1 BORROW  20
+POST /lenders/{{lenderId}}/transactions
+Content-Type: application/json
+
+{
+  "idLender": {{lenderId}},
+  "transactionPaymentType": "MONEY",
+  "transactionType": "BORROWED",
+  "transactionValue": 20.0
+}
+
+### Create transaction #2 BORROW  30
+POST /lenders/{{lenderId}}/transactions
+Content-Type: application/json
+
+{
+  "idLender": {{lenderId}},
+  "transactionPaymentType": "MONEY",
+  "transactionType": "BORROWED",
+  "transactionValue": 30.0
+}
+
+> {%
+    client.variables.set("transactionId", response.body.id);
+%}
+
+### Create transaction #3 BORROW  20
+POST /lenders/{{lenderId}}/transactions
+Content-Type: application/json
+
+{
+  "idLender": {{lenderId}},
+  "transactionPaymentType": "MONEY",
+  "transactionType": "BORROWED",
+  "transactionValue": 20.0
+}
+
+### Create transaction #4 PAYED   15
+POST /lenders/{{lenderId}}/transactions
+Content-Type: application/json
+
+{
+  "idLender": {{lenderId}},
+  "transactionPaymentType": "MONEY",
+  "transactionType": "PAYMENT",
+  "transactionValue": 20.0
+}
+
+### Cancel transaction #2 CANCEL -30
+POST /lenders/{{lenderId}}/transactions/cancel
+Content-Type: application/json
+
+{
+  "transactionId": {{transactionId}}
+}
