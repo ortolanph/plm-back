@@ -2,7 +2,7 @@
 
 ## Main text
 
-* [Personal Load Manager](docs/PersonalLoadManager.md)
+* [Personal Loan Manager](docs/PersonalLoanManager.md)
 
 ## Specifications Development
 
