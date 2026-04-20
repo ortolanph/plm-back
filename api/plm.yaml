@@ -14,6 +14,8 @@ tags:
     description: OTP code generation and validation operations
   - name: Lenders
     description: Lender management operations
+  - name: Transactions
+    description: Transaction management operations
 
 paths:
   /codes/generate:
@@ -188,6 +190,105 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /lenders/{lenderId}/transactions:
+    post:
+      summary: Create a new transaction
+      tags: [Transactions]
+      operationId: createTransaction
+      parameters:
+        - name: lenderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTransactionRequest'
+      responses:
+        '200':
+          description: Transaction created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+
+    get:
+      summary: Query transactions
+      tags: [Transactions]
+      operationId: queryTransactions
+      parameters:
+        - name: lenderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: minValue
+          in: query
+          required: false
+          schema:
+            type: number
+        - name: maxValue
+          in: query
+          required: false
+          schema:
+            type: number
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [BORROWED, PAYMENT, CANCELLED]
+      responses:
+        '200':
+          description: Transactions retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionQueryResponse'
+
+  /lenders/{lenderId}/transactions/cancel:
+    post:
+      summary: Cancel a transaction
+      tags: [Transactions]
+      operationId: cancelTransaction
+      parameters:
+        - name: lenderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelTransactionRequest'
+      responses:
+        '200':
+          description: Transaction cancelled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+
 components:
   schemas:
     GenerateResponse:
@@ -232,7 +333,6 @@ components:
           type: string
           description: Lender address
           example: "123 Main St"
-
     UpdateLenderRequest:
       type: object
       properties:
@@ -244,7 +344,6 @@ components:
           type: string
         address:
           type: string
-
     LenderResponse:
       type: object
       properties:
@@ -266,11 +365,83 @@ components:
         updatedAt:
           type: string
           format: date-time
-
+    CreateTransactionRequest:
+      type: object
+      required:
+        - idLender
+        - transactionValue
+        - transactionType
+      properties:
+        idLender:
+          type: string
+          format: uuid
+          description: Lender ID
+        transactionValue:
+          type: number
+          description: Transaction value
+        transactionType:
+          type: string
+          enum: [BORROWED, PAYMENT, CANCELLED]
+        transactionPaymentType:
+          type: string
+          enum: [MONEY, WIRE_TRANSACTION, PHONE, OTHERS]
+    CancelTransactionRequest:
+      type: object
+      required:
+        - transactionId
+      properties:
+        transactionId:
+          type: string
+          format: uuid
+          description: Transaction ID to cancel
+    TransactionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        lenderId:
+          type: string
+          format: uuid
+        transactionDate:
+          type: string
+          format: date-time
+        transactionValue:
+          type: number
+        transactionType:
+          type: string
+          enum: [BORROWED, PAYMENT, CANCELLED]
+        transactionPaymentType:
+          type: string
+          enum: [MONEY, WIRE_TRANSACTION, PHONE, OTHERS]
+    TransactionQueryResponse:
+      type: object
+      properties:
+        total:
+          type: integer
+        lender:
+          type: string
+        date:
+          type: string
+          format: date-time
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionItem'
+    TransactionItem:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time
+        value:
+          type: number
+        type:
+          type: string
+          enum: [BORROWED, PAYMENT, CANCELLED]
     ErrorResponse:
       type: object
       properties:
         error:
           type: string
           description: Error description
-
