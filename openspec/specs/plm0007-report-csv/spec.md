@@ -8,7 +8,7 @@ The system must be able to create a CSV report of the user transaction.
 
 #### Scenario: CSV Transaction of a Lender
 
-- GIVEN the use wants to create a report of the current transactions of a lender in CSV format
+- GIVEN the user wants to create a report of the current transactions of a lender in CSV format
 - WHEN there's a call to query history data on endpoint `/reports/csv/transactions/${lenderId}`
 - THEN the system generates the CSV report ordered by transaction date from older to newest
 
@@ -76,4 +76,4 @@ The system must be able to create a ZIP file with the two CSV reports.
 
 **File name**
 
-`all_DDMMYYYY_HHmmSS_lender_name.zip`
+`plm_csv_reports_DDMMYYYY_HHmmSS_lender_name.zip`

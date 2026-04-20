@@ -8,7 +8,7 @@ The system must be able to make a report of all debts.
 
 #### Scenario: Debts
 
-- GIVEN the use wants to create a report of all debts in JSON format
+- GIVEN the user wants to create a report of all debts in JSON format
 - WHEN there's a call to query history data on endpoint `/debts`
 - THEN the system generates the report
 

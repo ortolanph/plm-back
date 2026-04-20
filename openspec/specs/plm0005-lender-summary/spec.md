@@ -8,7 +8,7 @@ The system must be able to query the summary of a lender with the transactions a
 
 #### Scenario: Summary
 
-- GIVEN the use wants to create a summary report in JSON format
+- GIVEN the user wants to create a summary report in JSON format
 - WHEN there's a call to query history data on endpoint `/lenders/{lenderId}/summary`
 - THEN the system generates the report
 

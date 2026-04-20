@@ -8,7 +8,7 @@ The system must be able to query the history of a lender
 
 #### Scenario: Query History
 
-- GIVEN the use wants to query a lender history by date or date interval
+- GIVEN the user wants to query a lender history by date or date interval
 - OR by value or value interval
 - OR by type 
 - OR by a combination of parameters
