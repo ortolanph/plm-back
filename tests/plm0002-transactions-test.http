@@ -1,10 +1,14 @@
+@baseUrl = "http://localhost:9094"
+
 ### Create a Lender
 POST {{baseUrl}}/lenders
 Content-Type: application/json
 
 {
   "name": "Alice",
-  "email": "alice@example.com"
+  "phone": "351911195160",
+  "bankData": "IBAN:PT503239218390123801",
+  "address": "0 Fools Street"
 }
 
 > {%
@@ -12,7 +16,7 @@ Content-Type: application/json
 %}
 
 ### Create transaction #1 BORROW  20
-POST /lenders/{{lenderId}}/transactions
+POST {{baseUrl}}/lenders/{{lenderId}}/transactions
 Content-Type: application/json
 
 {
@@ -23,7 +27,7 @@ Content-Type: application/json
 }
 
 ### Create transaction #2 BORROW  30
-POST /lenders/{{lenderId}}/transactions
+POST {{baseUrl}}/lenders/{{lenderId}}/transactions
 Content-Type: application/json
 
 {
@@ -38,7 +42,7 @@ Content-Type: application/json
 %}
 
 ### Create transaction #3 BORROW  20
-POST /lenders/{{lenderId}}/transactions
+POST {{baseUrl}}/lenders/{{lenderId}}/transactions
 Content-Type: application/json
 
 {
@@ -49,7 +53,7 @@ Content-Type: application/json
 }
 
 ### Create transaction #4 PAYED   15
-POST /lenders/{{lenderId}}/transactions
+POST {{baseUrl}}/lenders/{{lenderId}}/transactions
 Content-Type: application/json
 
 {
@@ -60,9 +64,12 @@ Content-Type: application/json
 }
 
 ### Cancel transaction #2 CANCEL -30
-POST /lenders/{{lenderId}}/transactions/cancel
+POST {{baseUrl}}/lenders/{{lenderId}}/transactions/cancel
 Content-Type: application/json
 
 {
   "transactionId": {{transactionId}}
 }
+
+
+
