@@ -4,7 +4,12 @@
 
 ### Requirement: Personal Loan Report
 
-The system must be able to create a HTML report of the user information
+The system must be able to create a HTML report of the user information.
+
+Create the unit tests for each scenario.
+
+vMain endpoint: `/reports`.
+Specific endpoint: `/reports/html`
 
 #### Scenario: Report Generation
 

@@ -4,7 +4,9 @@
 
 ### Requirement: Query Lender History
 
-The system must be able to query the history of a lender 
+The system must be able to query the history of a lender.
+
+Create the unit tests for each scenario.
 
 #### Scenario: Query History
 

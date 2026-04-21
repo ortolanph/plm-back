@@ -1,0 +1,69 @@
+@baseUrl = http://localhost:9094
+
+### Actuator
+GET {{baseUrl}}/actuator
+Accept: application/json
+
+### Create a Lender
+POST {{baseUrl}}/lenders
+Content-Type: application/json
+
+{
+  "name": "Alice",
+  "phone": "351911195160",
+  "bankData": "IBAN:PT503239218390123801",
+  "address": "0 Fools Street"
+}
+
+### Create transaction #1 BORROW  20
+POST {{baseUrl}}/lenders/761c866f-57c4-4d4d-b292-09e670ecbdcf/transactions
+Content-Type: application/json
+
+{
+  "idLender": "761c866f-57c4-4d4d-b292-09e670ecbdcf",
+  "transactionPaymentType": "MONEY",
+  "transactionType": "BORROWED",
+  "transactionValue": 20.0
+}
+
+### Create transaction #2 BORROW  30
+POST {{baseUrl}}/lenders/761c866f-57c4-4d4d-b292-09e670ecbdcf/transactions
+Content-Type: application/json
+
+{
+  "idLender": "761c866f-57c4-4d4d-b292-09e670ecbdcf",
+  "transactionPaymentType": "MONEY",
+  "transactionType": "BORROWED",
+  "transactionValue": 30.0
+}
+
+### Create transaction #3 BORROW  20
+POST {{baseUrl}}/lenders/761c866f-57c4-4d4d-b292-09e670ecbdcf/transactions
+Content-Type: application/json
+
+{
+  "idLender": "761c866f-57c4-4d4d-b292-09e670ecbdcf",
+  "transactionPaymentType": "MONEY",
+  "transactionType": "BORROWED",
+  "transactionValue": 20.0
+}
+
+### Create transaction #4 PAYED   20
+POST {{baseUrl}}/lenders/761c866f-57c4-4d4d-b292-09e670ecbdcf/transactions
+Content-Type: application/json
+
+{
+  "idLender": "761c866f-57c4-4d4d-b292-09e670ecbdcf",
+  "transactionPaymentType": "MONEY",
+  "transactionType": "PAYMENT",
+  "transactionValue": 20.0
+}
+
+### Cancel transaction #2 CANCEL 20
+POST {{baseUrl}}/lenders/761c866f-57c4-4d4d-b292-09e670ecbdcf/transactions
+Content-Type: application/json
+
+{
+  "cancelTransactionId": "9cecfcc3-c0ea-409b-8ef2-5e4730707ce8",
+  "idLender": "761c866f-57c4-4d4d-b292-09e670ecbdcf"
+}
