@@ -4,7 +4,9 @@
 
 ### Requirement: Personal Loan Report
 
-The system must be able to create a PDF report of the user information
+The system must be able to create a PDF report of the user information.
+
+Create the unit tests for each scenario.
 
 #### Scenario: Report Generation
 

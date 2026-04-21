@@ -6,6 +6,8 @@
 
 The system must be able to create a CSV report of the user transaction.
 
+Create the unit tests for each scenario.
+
 #### Scenario: CSV Transaction of a Lender
 
 - GIVEN the user wants to create a report of the current transactions of a lender in CSV format

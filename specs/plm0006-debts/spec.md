@@ -6,6 +6,8 @@
 
 The system must be able to make a report of all debts.
 
+Create the unit tests for each scenario.
+
 #### Scenario: Debts
 
 - GIVEN the user wants to create a report of all debts in JSON format

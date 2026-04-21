@@ -7,6 +7,8 @@
 A settlement is when the user wants to end a debt of a lender. 
 The lender remains, but all his transactions till the day of the settlement are moved to the transaction table.
 
+Create the unit tests for each scenario.
+
 ```
 *TRANSACTION_HISTORY*
 id PK UK UUID

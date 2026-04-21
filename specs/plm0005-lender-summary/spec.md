@@ -6,6 +6,8 @@
 
 The system must be able to query the summary of a lender with the transactions and the history.
 
+Create the unit tests for each scenario.
+
 #### Scenario: Summary
 
 - GIVEN the user wants to create a summary report in JSON format
