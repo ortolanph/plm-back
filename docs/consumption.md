@@ -8,7 +8,9 @@
 |       PLM-0001 `Lenders`       |       73376 |             25303 |             37% |      $ 0.00 |
 | NO-FUNC - Convert to Mapstruct |      119783 |             46407 |             60% |      $ 0.00 |
 |     RESETED - New Session      |           0 |                 0 |               0 |           0 |
-|    PLM-0002 `Transactions`     |      119783 |                   |             37% |      $ 0.00 |
+|    PLM-0002 `Transactions`     |       72479 |                   |             36% |      $ 0.00 |
+|     RESETED - New Session      |           0 |                 0 |               0 |           0 |
+|    PLM-0002 `Transactions`     |       43910 |                   |             22% |      $ 0.00 |
 
 ## History Data
 
@@ -34,4 +36,10 @@
 
 * 72,479 tokens
 * 36% used
+* $0.00 spent
+
+### PLM-0003 - Settle a debt
+
+* 43,910 tokens
+* 22% used
 * $0.00 spent
