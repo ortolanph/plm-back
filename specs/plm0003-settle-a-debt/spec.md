@@ -54,3 +54,10 @@ For this requirement will be used **BORROWED**, **PAYMENT**, and **CANCELLED**.
 - WHEN the user calls DELETE `/lenders/{lenderId}`
 - THEN the system will check if there are open transactions to settle
 - AND the system does not delete the lender
+
+
+## Accptance Criteria
+
+1. Tests are implemented
+2. api/plm.yaml is updated
+3. 
