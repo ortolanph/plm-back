@@ -8,6 +8,9 @@ The system must be able to create a HTML report of the user information.
 
 Create the unit tests for each scenario.
 
+vMain endpoint: `/reports`.
+Specific endpoint: `/reports/html`
+
 #### Scenario: Report Generation
 
 - GIVEN the user wants to create the personal load manager report

@@ -47,7 +47,8 @@ class TransactionServiceTest {
                 lenderId, 
                 new BigDecimal("100.00"), 
                 TransactionType.BORROWED, 
-                TransactionPaymentType.MONEY);
+                TransactionPaymentType.MONEY,
+                null);
 
         Lender lender = Lender.builder().id(lenderId).name("John Doe").build();
         Transaction transaction = Transaction.builder()
@@ -85,7 +86,8 @@ class TransactionServiceTest {
                 lenderId,
                 new BigDecimal("50.00"),
                 TransactionType.PAYMENT,
-                TransactionPaymentType.WIRE_TRANSACTION);
+                TransactionPaymentType.WIRE_TRANSACTION,
+                null);
 
         Lender lender = Lender.builder().id(lenderId).name("John Doe").build();
         Transaction transaction = Transaction.builder()
@@ -122,6 +124,7 @@ class TransactionServiceTest {
                 lenderId,
                 new BigDecimal("100.00"),
                 TransactionType.BORROWED,
+                null,
                 null);
 
         when(lenderRepository.findById(lenderId)).thenReturn(Optional.empty());
@@ -130,10 +133,15 @@ class TransactionServiceTest {
     }
 
     @Test
-    void cancel_success_createsCancelledTransaction() {
+    void create_withCancelTransactionId_createsCancelledTransaction() {
         UUID transactionId = UUID.randomUUID();
         UUID lenderId = UUID.randomUUID();
-        CancelTransactionRequest request = new CancelTransactionRequest(transactionId);
+        CreateTransactionRequest request = new CreateTransactionRequest(
+                lenderId,
+                null,
+                null,
+                null,
+                transactionId);
 
         Lender lender = Lender.builder().id(lenderId).name("John Doe").build();
         Transaction originalTransaction = Transaction.builder()
@@ -162,21 +170,27 @@ class TransactionServiceTest {
                 TransactionType.CANCELLED,
                 TransactionPaymentType.MONEY);
 
+        when(lenderRepository.findById(lenderId)).thenReturn(Optional.of(lender));
         when(transactionRepository.findById(transactionId)).thenReturn(Optional.of(originalTransaction));
         when(transactionRepository.save(any(Transaction.class))).thenReturn(cancelledTransaction);
         when(mapper.toResponse(cancelledTransaction)).thenReturn(expectedResponse);
 
-        TransactionResponse response = transactionService.cancel(request);
+        TransactionResponse response = transactionService.create(request);
 
         assertNotNull(response);
         assertEquals(TransactionType.CANCELLED, response.transactionType());
     }
 
     @Test
-    void cancel_alreadyCancelled_throwsException() {
+    void create_withCancelTransactionId_alreadyCancelled_throwsException() {
         UUID transactionId = UUID.randomUUID();
         UUID lenderId = UUID.randomUUID();
-        CancelTransactionRequest request = new CancelTransactionRequest(transactionId);
+        CreateTransactionRequest request = new CreateTransactionRequest(
+                lenderId,
+                null,
+                null,
+                null,
+                transactionId);
 
         Lender lender = Lender.builder().id(lenderId).name("John Doe").build();
         Transaction alreadyCancelled = Transaction.builder()
@@ -188,19 +202,29 @@ class TransactionServiceTest {
                 .transactionPaymentType(TransactionPaymentType.MONEY)
                 .build();
 
+        when(lenderRepository.findById(lenderId)).thenReturn(Optional.of(lender));
         when(transactionRepository.findById(transactionId)).thenReturn(Optional.of(alreadyCancelled));
 
-        assertThrows(IllegalArgumentException.class, () -> transactionService.cancel(request));
+        assertThrows(IllegalArgumentException.class, () -> transactionService.create(request));
     }
 
     @Test
-    void cancel_transactionNotFound_throwsException() {
+    void create_withCancelTransactionId_notFound_throwsException() {
         UUID transactionId = UUID.randomUUID();
-        CancelTransactionRequest request = new CancelTransactionRequest(transactionId);
+        UUID lenderId = UUID.randomUUID();
+        CreateTransactionRequest request = new CreateTransactionRequest(
+                lenderId,
+                null,
+                null,
+                null,
+                transactionId);
 
+        Lender lender = Lender.builder().id(lenderId).name("John Doe").build();
+
+        when(lenderRepository.findById(lenderId)).thenReturn(Optional.of(lender));
         when(transactionRepository.findById(transactionId)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> transactionService.cancel(request));
+        assertThrows(IllegalArgumentException.class, () -> transactionService.create(request));
     }
 
     @Test

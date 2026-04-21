@@ -25,10 +25,33 @@ public class TransactionService {
 
     @Transactional
     public TransactionResponse create(CreateTransactionRequest request) {
-        log.info("TransactionService::create(idLender={}, type={})", request.idLender(), request.transactionType());
+        log.info("TransactionService::create(idLender={}, type={}, cancelId={})", 
+                request.idLender(), request.transactionType(), request.cancelTransactionId());
         
         Lender lender = lenderRepository.findById(request.idLender())
                 .orElseThrow(() -> new IllegalArgumentException("Lender not found: " + request.idLender()));
+        
+        if (request.cancelTransactionId() != null) {
+            log.info("TransactionService::create - cancelling transaction: {}", request.cancelTransactionId());
+            
+            Transaction originalTransaction = transactionRepository.findById(request.cancelTransactionId())
+                    .orElseThrow(() -> new IllegalArgumentException("Transaction not found: " + request.cancelTransactionId()));
+            
+            if (originalTransaction.getTransactionType() == TransactionType.CANCELLED) {
+                throw new IllegalArgumentException("Transaction is already cancelled");
+            }
+            
+            Transaction cancelledTransaction = Transaction.builder()
+                    .lender(lender)
+                    .transactionDate(LocalDateTime.now())
+                    .transactionValue(originalTransaction.getTransactionValue())
+                    .transactionType(TransactionType.CANCELLED)
+                    .transactionPaymentType(originalTransaction.getTransactionPaymentType())
+                    .build();
+            
+            cancelledTransaction = transactionRepository.save(cancelledTransaction);
+            return mapper.toResponse(cancelledTransaction);
+        }
         
         Transaction transaction = Transaction.builder()
                 .lender(lender)
@@ -40,29 +63,6 @@ public class TransactionService {
         
         transaction = transactionRepository.save(transaction);
         return mapper.toResponse(transaction);
-    }
-
-    @Transactional
-    public TransactionResponse cancel(CancelTransactionRequest request) {
-        log.info("TransactionService::cancel(transactionId={})", request.transactionId());
-        
-        Transaction originalTransaction = transactionRepository.findById(request.transactionId())
-                .orElseThrow(() -> new IllegalArgumentException("Transaction not found: " + request.transactionId()));
-        
-        if (originalTransaction.getTransactionType() == TransactionType.CANCELLED) {
-            throw new IllegalArgumentException("Transaction is already cancelled");
-        }
-        
-        Transaction cancelledTransaction = Transaction.builder()
-                .lender(originalTransaction.getLender())
-                .transactionDate(LocalDateTime.now())
-                .transactionValue(originalTransaction.getTransactionValue())
-                .transactionType(TransactionType.CANCELLED)
-                .transactionPaymentType(originalTransaction.getTransactionPaymentType())
-                .build();
-        
-        cancelledTransaction = transactionRepository.save(cancelledTransaction);
-        return mapper.toResponse(cancelledTransaction);
     }
 
     @Transactional(readOnly = true)
@@ -86,10 +86,6 @@ public class TransactionService {
                         t.getTransactionValue(),
                         t.getTransactionType()))
                 .toList();
-        
-        BigDecimal total = items.stream()
-                .map(TransactionItem::value)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
         
         return new TransactionQueryResponse(
                 transactions.size(),

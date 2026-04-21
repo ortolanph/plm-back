@@ -5,8 +5,9 @@
 ### Requirement: Debts
 
 The system must be able to make a report of all debts.
-
 Create the unit tests for each scenario.
+Main endpoint: `/debts`.
+
 
 #### Scenario: Debts
 

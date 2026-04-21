@@ -192,7 +192,7 @@ paths:
 
   /lenders/{lenderId}/transactions:
     post:
-      summary: Create a new transaction
+      summary: Create a new transaction or cancel an existing one
       tags: [Transactions]
       operationId: createTransaction
       parameters:
@@ -210,7 +210,7 @@ paths:
               $ref: '#/components/schemas/CreateTransactionRequest'
       responses:
         '200':
-          description: Transaction created successfully
+          description: Transaction created or cancelled successfully
           content:
             application/json:
               schema:
@@ -262,32 +262,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TransactionQueryResponse'
-
-  /lenders/{lenderId}/transactions/cancel:
-    post:
-      summary: Cancel a transaction
-      tags: [Transactions]
-      operationId: cancelTransaction
-      parameters:
-        - name: lenderId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CancelTransactionRequest'
-      responses:
-        '200':
-          description: Transaction cancelled successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TransactionResponse'
 
 components:
   schemas:
@@ -369,8 +343,6 @@ components:
       type: object
       required:
         - idLender
-        - transactionValue
-        - transactionType
       properties:
         idLender:
           type: string
@@ -378,13 +350,18 @@ components:
           description: Lender ID
         transactionValue:
           type: number
-          description: Transaction value
+          description: Transaction value (required for BORROWED and PAYMENT)
         transactionType:
           type: string
           enum: [BORROWED, PAYMENT, CANCELLED]
         transactionPaymentType:
           type: string
           enum: [MONEY, WIRE_TRANSACTION, PHONE, OTHERS]
+        cancelTransactionId:
+          type: string
+          format: uuid
+          description: Transaction ID to cancel (when provided, creates a CANCELLED transaction)
+
     CancelTransactionRequest:
       type: object
       required:
@@ -393,7 +370,8 @@ components:
         transactionId:
           type: string
           format: uuid
-          description: Transaction ID to cancel
+          description: Transaction ID to cancel (deprecated, use CreateTransactionRequest with cancelTransactionId)
+
     TransactionResponse:
       type: object
       properties:

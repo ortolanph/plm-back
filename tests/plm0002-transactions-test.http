@@ -1,4 +1,8 @@
-@baseUrl = "http://localhost:9094"
+@baseUrl = http://localhost:9094
+
+### Actuator
+GET {{baseUrl}}/actuator
+Accept: application/json
 
 ### Create a Lender
 POST {{baseUrl}}/lenders
@@ -11,65 +15,55 @@ Content-Type: application/json
   "address": "0 Fools Street"
 }
 
-> {%
-    client.variables.set("lenderId", response.body.id);
-%}
-
 ### Create transaction #1 BORROW  20
-POST {{baseUrl}}/lenders/{{lenderId}}/transactions
+POST {{baseUrl}}/lenders/761c866f-57c4-4d4d-b292-09e670ecbdcf/transactions
 Content-Type: application/json
 
 {
-  "idLender": {{lenderId}},
+  "idLender": "761c866f-57c4-4d4d-b292-09e670ecbdcf",
   "transactionPaymentType": "MONEY",
   "transactionType": "BORROWED",
   "transactionValue": 20.0
 }
 
 ### Create transaction #2 BORROW  30
-POST {{baseUrl}}/lenders/{{lenderId}}/transactions
+POST {{baseUrl}}/lenders/761c866f-57c4-4d4d-b292-09e670ecbdcf/transactions
 Content-Type: application/json
 
 {
-  "idLender": {{lenderId}},
+  "idLender": "761c866f-57c4-4d4d-b292-09e670ecbdcf",
   "transactionPaymentType": "MONEY",
   "transactionType": "BORROWED",
   "transactionValue": 30.0
 }
 
-> {%
-    client.variables.set("transactionId", response.body.id);
-%}
-
 ### Create transaction #3 BORROW  20
-POST {{baseUrl}}/lenders/{{lenderId}}/transactions
+POST {{baseUrl}}/lenders/761c866f-57c4-4d4d-b292-09e670ecbdcf/transactions
 Content-Type: application/json
 
 {
-  "idLender": {{lenderId}},
+  "idLender": "761c866f-57c4-4d4d-b292-09e670ecbdcf",
   "transactionPaymentType": "MONEY",
   "transactionType": "BORROWED",
   "transactionValue": 20.0
 }
 
-### Create transaction #4 PAYED   15
-POST {{baseUrl}}/lenders/{{lenderId}}/transactions
+### Create transaction #4 PAYED   20
+POST {{baseUrl}}/lenders/761c866f-57c4-4d4d-b292-09e670ecbdcf/transactions
 Content-Type: application/json
 
 {
-  "idLender": {{lenderId}},
+  "idLender": "761c866f-57c4-4d4d-b292-09e670ecbdcf",
   "transactionPaymentType": "MONEY",
   "transactionType": "PAYMENT",
   "transactionValue": 20.0
 }
 
-### Cancel transaction #2 CANCEL -30
-POST {{baseUrl}}/lenders/{{lenderId}}/transactions/cancel
+### Cancel transaction #2 CANCEL 20
+POST {{baseUrl}}/lenders/761c866f-57c4-4d4d-b292-09e670ecbdcf/transactions
 Content-Type: application/json
 
 {
-  "transactionId": {{transactionId}}
+  "cancelTransactionId": "9cecfcc3-c0ea-409b-8ef2-5e4730707ce8",
+  "idLender": "761c866f-57c4-4d4d-b292-09e670ecbdcf"
 }
-
-
-

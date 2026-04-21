@@ -26,14 +26,6 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.create(request));
     }
 
-    @PostMapping("/cancel")
-    public ResponseEntity<TransactionResponse> cancel(
-            @PathVariable UUID lenderId,
-            @RequestBody CancelTransactionRequest request) {
-        log.info("TransactionController::cancel(lenderId={})", lenderId);
-        return ResponseEntity.ok(transactionService.cancel(request));
-    }
-
     @GetMapping
     public ResponseEntity<TransactionQueryResponse> query(
             @PathVariable UUID lenderId,

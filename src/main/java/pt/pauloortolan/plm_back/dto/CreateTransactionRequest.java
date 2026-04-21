@@ -10,4 +10,5 @@ public record CreateTransactionRequest(
         UUID idLender,
         BigDecimal transactionValue,
         TransactionType transactionType,
-        TransactionPaymentType transactionPaymentType) {}
+        TransactionPaymentType transactionPaymentType,
+        UUID cancelTransactionId) {}
