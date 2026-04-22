@@ -28,3 +28,9 @@ The system must be able to create an ODS report of the user information
 - WHEN there's a call to query history data on endpoint `/reports/excel?opendoc=true`
 - THEN the system generates the XLSX report with the layout defined in `report.ods`
 - AND name it as `personal_load_manager_DDMMYYYY_HHmmSS.ods`
+
+## Acceptance Criteria
+
+1. Tests are implemented
+2. api/plm.yaml is updated
+3. Migrations are created if applicable

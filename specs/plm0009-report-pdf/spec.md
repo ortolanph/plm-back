@@ -17,3 +17,9 @@ Specific endpoint: `/reports/pdf`
 - WHEN there's a call to query history data on endpoint `/reports/pdf`
 - THEN the system generates the HTML report with the layout defined in `report.pdf`
 - AND name it as `personal_load_manager_DDMMYYYY_HHmmSS.pdf`
+
+## Acceptance Criteria
+
+1. Tests are implemented
+2. api/plm.yaml is updated
+3. Migrations are created if applicable

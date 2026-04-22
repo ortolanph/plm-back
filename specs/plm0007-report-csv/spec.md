@@ -82,3 +82,9 @@ The system must be able to create a ZIP file with the two CSV reports.
 **File name**
 
 `plm_csv_reports_DDMMYYYY_HHmmSS_lender_name.zip`
+
+## Acceptance Criteria
+
+1. Tests are implemented
+2. api/plm.yaml is updated
+3. Migrations are created if applicable
