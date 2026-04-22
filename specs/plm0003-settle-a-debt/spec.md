@@ -60,4 +60,4 @@ For this requirement will be used **BORROWED**, **PAYMENT**, and **CANCELLED**.
 
 1. Tests are implemented
 2. api/plm.yaml is updated
-3. 
+3. Migrations are created if applicable
