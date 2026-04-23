@@ -1,6 +1,6 @@
 @baseUrl = http://localhost:9094
-@lenderId = 988802-323
-@transactionCancelId = 2323293-90232
+@lenderId = 8af407c4-c00a-4f21-8f78-fff3d321bbfe
+@transactionCancelId = 9ea0a9dd-d5bc-483e-8af7-55e0ad813e14
 
 ### Actuator
 GET {{baseUrl}}/actuator
@@ -75,7 +75,7 @@ DELETE {{baseUrl}}/lenders/{{lenderId}}
 Content-type: application/json
 
 ### Settle a debt
-POST {{baseUrl}}/lenders/{{lenderId}}/transactions
+POST {{baseUrl}}/lenders/settle
 Content-Type: application/json
 
 {
