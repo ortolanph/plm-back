@@ -10,7 +10,9 @@
 |     RESETED - New Session      |           0 |                 0 |               0 |           0 |
 |    PLM-0002 `Transactions`     |       72479 |                   |             36% |      $ 0.00 |
 |     RESETED - New Session      |           0 |                 0 |               0 |           0 |
-|    PLM-0002 `Transactions`     |       43910 |                   |             22% |      $ 0.00 |
+|   PLM-0003 `Debt Settlement`   |       43910 |                   |             22% |      $ 0.00 |
+|     RESETED - New Session      |           0 |                 0 |               0 |           0 |
+|    PLM-0004 `Query History`    |           0 |                 0 |             22% |      $ 0.00 |
 
 ## History Data
 
@@ -43,3 +45,10 @@
 * 43,910 tokens
 * 22% used
 * $0.00 spent
+
+### PLM-0004 - Query Lender History
+
+* tokens
+* percentage
+* money spen
+

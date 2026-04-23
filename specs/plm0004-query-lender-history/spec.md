@@ -6,8 +6,6 @@
 
 The system must be able to query the history of a lender.
 
-Create the unit tests for each scenario.
-
 #### Scenario: Query History
 
 - GIVEN the user wants to query a lender history by date or date interval
@@ -22,20 +20,20 @@ Format
 ```
 {
 	"lender": "John Doe",
-	"date": "CURRENT_DATE('DD/MM/YYYY HH:mm:SS')",
+	"date": "CURRENT_DATE('YYYY-MM-DD HH:mm:SS')",
 	"history": [
 		{
-			"date": "DD/MM/YYYY",
+			"date": "YYYY-MM-DD",
 			"value": 100,
 			"type": "BORROWED"
 		},
 		{
-			"date": "DD/MM/YYYY",
+			"date": "YYYY-MM-DD",
 			"value": 200,
 			"type": "BORROWED"
 		},
 		{
-			"date": "DD/MM/YYYY",
+			"date": "YYYY-MM-DD",
 			"value": 300,
 			"type": "PAID_IN_FULL"
 		}
@@ -46,5 +44,5 @@ Format
 ## Acceptance Criteria
 
 1. Tests are implemented
-2. api/plm.yaml is updated
+2. API documentation (api/plm.yaml) is updated
 3. Migrations are created if applicable

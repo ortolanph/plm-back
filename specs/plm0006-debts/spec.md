@@ -19,7 +19,7 @@ Format:
 ```
 {
  "total_debt": 10000,
- "date": "CURRENT_DATE('DD/MM/YYYY HH:mm:SS')"
+ "date": "CURRENT_DATE('YYYY-MM-DD HH:mm:SS')"
  "details": [
   {
    "lender": "John Doe",
@@ -44,5 +44,5 @@ Format:
 ## Acceptance Criteria
 
 1. Tests are implemented
-2. api/plm.yaml is updated
+2. API documentation (api/plm.yaml) is updated
 3. Migrations are created if applicable
