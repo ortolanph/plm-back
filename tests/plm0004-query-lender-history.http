@@ -1,0 +1,327 @@
+@baseUrl = http://localhost:9094
+@contentType = application/json
+
+### Actuator
+GET {{baseUrl}}/actuator
+Accept: application/json
+
+### ============================================
+### CREATE LENDERS
+### ============================================
+
+### Create Lender #1 - John Doe (1 settlement)
+POST {{baseUrl}}/lenders
+Content-Type: {{contentType}}
+
+{
+  "name": "John Doe",
+  "phone": "+351911111111",
+  "bankData": "IBAN:PT000000000000000001",
+  "address": "123 Main Street"
+}
+
+> {% client.global.set("lenderId1", response.body.id); %}
+
+### Create Lender #2 - Jane Smith (3 settlements)
+POST {{baseUrl}}/lenders
+Content-Type: {{contentType}}
+
+{
+  "name": "Jane Smith",
+  "phone": "+351922222222",
+  "bankData": "IBAN:PT000000000000000002",
+  "address": "456 Oak Avenue"
+}
+
+> {% client.global.set("lenderId2", response.body.id); %}
+
+### Create Lender #3 - Bob Wilson (5 settlements)
+POST {{baseUrl}}/lenders
+Content-Type: {{contentType}}
+
+{
+  "name": "Bob Wilson",
+  "phone": "+351933333333",
+  "bankData": "IBAN:PT000000000000000003",
+  "address": "789 Pine Road"
+}
+
+> {% client.global.set("lenderId3", response.body.id); %}
+
+### ============================================
+### CREATE SETTLEMENTS FOR LENDER 1 (John Doe)
+### ============================================
+
+### Create transaction for John Doe
+POST {{baseUrl}}/lenders/{{lenderId1}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "idLender": "{{lenderId1}}",
+  "transactionPaymentType": "MONEY",
+  "transactionType": "BORROWED",
+  "transactionValue": 100.00
+}
+
+### Settle John Doe (1 settlement)
+POST {{baseUrl}}/lenders/settle
+Content-Type: {{contentType}}
+
+{
+  "lenderId": "{{lenderId1}}",
+  "settlementType": "PAID_IN_FULL",
+  "paymentType": "MONEY"
+}
+
+### ============================================
+### CREATE SETTLEMENTS FOR LENDER 2 (Jane Smith)
+### ============================================
+
+### Create transaction #1 for Jane Smith
+POST {{baseUrl}}/lenders/{{lenderId2}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "idLender": "{{lenderId2}}",
+  "transactionPaymentType": "MONEY",
+  "transactionType": "BORROWED",
+  "transactionValue": 200.00
+}
+
+### Create transaction #2 for Jane Smith
+POST {{baseUrl}}/lenders/{{lenderId2}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "idLender": "{{lenderId2}}",
+  "transactionPaymentType": "MONEY",
+  "transactionType": "BORROWED",
+  "transactionValue": 150.00
+}
+
+### Settle Jane Smith (1st settlement)
+POST {{baseUrl}}/lenders/settle
+Content-Type: {{contentType}}
+
+{
+  "lenderId": "{{lenderId2}}",
+  "settlementType": "PAID_IN_FULL",
+  "paymentType": "MONEY"
+}
+
+### Create transaction #3 for Jane Smith
+POST {{baseUrl}}/lenders/{{lenderId2}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "idLender": "{{lenderId2}}",
+  "transactionPaymentType": "WIRE_TRANSACTION",
+  "transactionType": "BORROWED",
+  "transactionValue": 300.00
+}
+
+### Create transaction #4 for Jane Smith
+POST {{baseUrl}}/lenders/{{lenderId2}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "idLender": "{{lenderId2}}",
+  "transactionPaymentType": "PHONE",
+  "transactionType": "BORROWED",
+  "transactionValue": 50.00
+}
+
+### Settle Jane Smith (2nd settlement - FORGIVEN)
+POST {{baseUrl}}/lenders/settle
+Content-Type: {{contentType}}
+
+{
+  "lenderId": "{{lenderId2}}",
+  "settlementType": "FORGIVEN"
+}
+
+### Create transaction #5 for Jane Smith
+POST {{baseUrl}}/lenders/{{lenderId2}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "idLender": "{{lenderId2}}",
+  "transactionPaymentType": "MONEY",
+  "transactionType": "BORROWED",
+  "transactionValue": 75.00
+}
+
+### Settle Jane Smith (3rd settlement)
+POST {{baseUrl}}/lenders/settle
+Content-Type: {{contentType}}
+
+{
+  "lenderId": "{{lenderId2}}",
+  "settlementType": "PAID_IN_FULL",
+  "paymentType": "MONEY"
+}
+
+### ============================================
+### CREATE SETTLEMENTS FOR LENDER 3 (Bob Wilson)
+### ============================================
+
+### Create transaction #1 for Bob Wilson
+POST {{baseUrl}}/lenders/{{lenderId3}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "idLender": "{{lenderId3}}",
+  "transactionPaymentType": "MONEY",
+  "transactionType": "BORROWED",
+  "transactionValue": 500.00
+}
+
+### Create transaction #2 for Bob Wilson
+POST {{baseUrl}}/lenders/{{lenderId3}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "idLender": "{{lenderId3}}",
+  "transactionPaymentType": "MONEY",
+  "transactionType": "BORROWED",
+  "transactionValue": 250.00
+}
+
+### Settle Bob Wilson (1st settlement)
+POST {{baseUrl}}/lenders/settle
+Content-Type: {{contentType}}
+
+{
+  "lenderId": "{{lenderId3}}",
+  "settlementType": "PAID_IN_FULL",
+  "paymentType": "MONEY"
+}
+
+### Create transaction #3 for Bob Wilson
+POST {{baseUrl}}/lenders/{{lenderId3}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "idLender": "{{lenderId3}}",
+  "transactionPaymentType": "MONEY",
+  "transactionType": "BORROWED",
+  "transactionValue": 100.00
+}
+
+### Settle Bob Wilson (2nd settlement - FORGIVEN)
+POST {{baseUrl}}/lenders/settle
+Content-Type: {{contentType}}
+
+{
+  "lenderId": "{{lenderId3}}",
+  "settlementType": "FORGIVEN"
+}
+
+### Create transaction #4 for Bob Wilson
+POST {{baseUrl}}/lenders/{{lenderId3}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "idLender": "{{lenderId3}}",
+  "transactionPaymentType": "PHONE",
+  "transactionType": "BORROWED",
+  "transactionValue": 75.00
+}
+
+### Create transaction #5 for Bob Wilson
+POST {{baseUrl}}/lenders/{{lenderId3}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "idLender": "{{lenderId3}}",
+  "transactionPaymentType": "WIRE_TRANSACTION",
+  "transactionType": "BORROWED",
+  "transactionValue": 125.00
+}
+
+### Settle Bob Wilson (3rd settlement)
+POST {{baseUrl}}/lenders/settle
+Content-Type: {{contentType}}
+
+{
+  "lenderId": "{{lenderId3}}",
+  "settlementType": "PAID_IN_FULL",
+  "paymentType": "MONEY"
+}
+
+### Create transaction #6 for Bob Wilson
+POST {{baseUrl}}/lenders/{{lenderId3}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "idLender": "{{lenderId3}}",
+  "transactionPaymentType": "MONEY",
+  "transactionType": "BORROWED",
+  "transactionValue": 60.00
+}
+
+### Settle Bob Wilson (4th settlement)
+POST {{baseUrl}}/lenders/settle
+Content-Type: {{contentType}}
+
+{
+  "lenderId": "{{lenderId3}}",
+  "settlementType": "PAID_IN_FULL",
+  "paymentType": "MONEY"
+}
+
+### Create transaction #7 for Bob Wilson
+POST {{baseUrl}}/lenders/{{lenderId3}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "idLender": "{{lenderId3}}",
+  "transactionPaymentType": "PHONE",
+  "transactionType": "BORROWED",
+  "transactionValue": 40.00
+}
+
+### Settle Bob Wilson (5th settlement - FORGIVEN)
+POST {{baseUrl}}/lenders/settle
+Content-Type: {{contentType}}
+
+{
+  "lenderId": "{{lenderId3}}",
+  "settlementType": "FORGIVEN"
+}
+
+### ============================================
+### QUERY LENDER HISTORY TESTS
+### ============================================
+
+### Query all history for John Doe
+GET {{baseUrl}}/lenders/{{lenderId1}}/history
+Accept: {{contentType}}
+
+### Query all history for Jane Smith
+GET {{baseUrl}}/lenders/{{lenderId2}}/history
+Accept: {{contentType}}
+
+### Query all history for Bob Wilson
+GET {{baseUrl}}/lenders/{{lenderId3}}/history
+Accept: {{contentType}}
+
+### Query history for John Doe filtered by type PAID_IN_FULL
+GET {{baseUrl}}/lenders/{{lenderId1}}/history?type=PAID_IN_FULL
+Accept: {{contentType}}
+
+### Query history for Jane Smith filtered by type FORGIVEN
+GET {{baseUrl}}/lenders/{{lenderId2}}/history?type=FORGIVEN
+Accept: {{contentType}}
+
+### Query history for Bob Wilson filtered by value range
+GET {{baseUrl}}/lenders/{{lenderId3}}/history?minValue=75&maxValue=300
+Accept: {{contentType}}
+
+### Query history for Jane Smith with combined filters (date range + type)
+GET {{baseUrl}}/lenders/{{lenderId2}}/history?startDate=2025-01-01&endDate=2026-12-31&type=PAID_IN_FULL
+Accept: {{contentType}}
+
+### Query history for Bob Wilson with all filters
+GET {{baseUrl}}/lenders/{{lenderId3}}/history?startDate=2025-01-01&endDate=2026-12-31&minValue=100&maxValue=500&type=PAID_IN_FULL
+Accept: {{contentType}}
