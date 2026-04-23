@@ -50,6 +50,9 @@ public class TransactionHistory {
     @Column(name = "history_type", nullable = false)
     private HistoryType historyType;
 
+    @Column(name = "lender_id")
+    private UUID lenderId;
+
     @PrePersist
     void onCreate() {
         if (this.historyDate == null) {

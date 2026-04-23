@@ -10,6 +10,7 @@ import pt.pauloortolan.plm_back.model.*;
 import pt.pauloortolan.plm_back.repository.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -21,6 +22,7 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final LenderRepository lenderRepository;
+    private final TransactionHistoryRepository transactionHistoryRepository;
     private final TransactionMapper mapper;
 
     @Transactional
@@ -91,6 +93,33 @@ public class TransactionService {
                 transactions.size(),
                 lender.getName(),
                 LocalDateTime.now(),
+                items);
+    }
+
+    @Transactional(readOnly = true)
+    public HistoryQueryResponse queryHistory(UUID lenderId, String startDate, String endDate,
+            BigDecimal minValue, BigDecimal maxValue, String type) {
+        log.info("TransactionService::queryHistory(lenderId={})", lenderId);
+
+        Lender lender = lenderRepository.findById(lenderId)
+                .orElseThrow(() -> new IllegalArgumentException("Lender not found: " + lenderId));
+
+        LocalDate startLocalDate = startDate != null ? LocalDate.parse(startDate) : null;
+        LocalDate endLocalDate = endDate != null ? LocalDate.parse(endDate) : null;
+
+        List<TransactionHistory> historyList = transactionHistoryRepository.findByFilters(
+                lenderId, startLocalDate, endLocalDate, minValue, maxValue, type);
+
+        List<HistoryItem> items = historyList.stream()
+                .map(h -> new HistoryItem(
+                        h.getHistoryDate().toLocalDate().toString(),
+                        h.getTransactionValue(),
+                        h.getHistoryType().name()))
+                .toList();
+
+        return new HistoryQueryResponse(
+                lender.getName(),
+                LocalDateTime.now().toString(),
                 items);
     }
 }

@@ -9,6 +9,7 @@ import pt.pauloortolan.plm_back.dto.*;
 import pt.pauloortolan.plm_back.mapper.TransactionMapper;
 import pt.pauloortolan.plm_back.model.*;
 import pt.pauloortolan.plm_back.repository.LenderRepository;
+import pt.pauloortolan.plm_back.repository.TransactionHistoryRepository;
 import pt.pauloortolan.plm_back.repository.TransactionRepository;
 
 import java.math.BigDecimal;
@@ -18,7 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,13 +32,16 @@ class TransactionServiceTest {
     private LenderRepository lenderRepository;
 
     @Mock
+    private TransactionHistoryRepository transactionHistoryRepository;
+
+    @Mock
     private TransactionMapper mapper;
 
     private TransactionService transactionService;
 
     @BeforeEach
     void setUp() {
-        transactionService = new TransactionService(transactionRepository, lenderRepository, mapper);
+        transactionService = new TransactionService(transactionRepository, lenderRepository, transactionHistoryRepository, mapper);
     }
 
     @Test
@@ -268,5 +272,73 @@ class TransactionServiceTest {
 
         assertThrows(IllegalArgumentException.class, () -> transactionService.query(
                 lenderId, null, null, null, null, null));
+    }
+
+    @Test
+    void queryHistory_withFilters_returnsHistory() {
+        UUID lenderId = UUID.randomUUID();
+        Lender lender = Lender.builder().id(lenderId).name("John Doe").build();
+
+        TransactionHistory h1 = TransactionHistory.builder()
+                .id(UUID.randomUUID())
+                .lenderName("John Doe")
+                .historyDate(LocalDateTime.now())
+                .transactionValue(new BigDecimal("100.00"))
+                .historyType(HistoryType.PAID_IN_FULL)
+                .build();
+
+        TransactionHistory h2 = TransactionHistory.builder()
+                .id(UUID.randomUUID())
+                .lenderName("John Doe")
+                .historyDate(LocalDateTime.now())
+                .transactionValue(new BigDecimal("200.00"))
+                .historyType(HistoryType.FORGIVEN)
+                .build();
+
+        when(lenderRepository.findById(lenderId)).thenReturn(Optional.of(lender));
+        when(transactionHistoryRepository.findByFilters(eq(lenderId), any(), any(), any(), any(), any()))
+                .thenReturn(List.of(h1, h2));
+
+        HistoryQueryResponse response = transactionService.queryHistory(
+                lenderId, null, null, null, null, null);
+
+        assertNotNull(response);
+        assertEquals(2, response.history().size());
+        assertEquals("John Doe", response.lender());
+    }
+
+    @Test
+    void queryHistory_lenderNotFound_throwsException() {
+        UUID lenderId = UUID.randomUUID();
+
+        when(lenderRepository.findById(lenderId)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> transactionService.queryHistory(
+                lenderId, null, null, null, null, null));
+    }
+
+    @Test
+    void queryHistory_noFilters_returnsAllHistory() {
+        UUID lenderId = UUID.randomUUID();
+        Lender lender = Lender.builder().id(lenderId).name("John Doe").build();
+
+        TransactionHistory h1 = TransactionHistory.builder()
+                .id(UUID.randomUUID())
+                .lenderName("John Doe")
+                .historyDate(LocalDateTime.now())
+                .transactionValue(new BigDecimal("100.00"))
+                .historyType(HistoryType.PAID_IN_FULL)
+                .build();
+
+        when(lenderRepository.findById(lenderId)).thenReturn(Optional.of(lender));
+        when(transactionHistoryRepository.findByFilters(eq(lenderId), isNull(), isNull(), isNull(), isNull(), isNull()))
+                .thenReturn(List.of(h1));
+
+        HistoryQueryResponse response = transactionService.queryHistory(
+                lenderId, null, null, null, null, null);
+
+        assertNotNull(response);
+        assertEquals(1, response.history().size());
+        assertEquals("PAID_IN_FULL", response.history().get(0).type());
     }
 }

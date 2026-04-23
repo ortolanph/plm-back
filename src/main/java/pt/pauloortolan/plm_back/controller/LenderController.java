@@ -6,7 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.pauloortolan.plm_back.dto.*;
 import pt.pauloortolan.plm_back.service.LenderService;
+import pt.pauloortolan.plm_back.service.TransactionService;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,6 +19,7 @@ import java.util.UUID;
 public class LenderController {
 
     private final LenderService lenderService;
+    private final TransactionService transactionService;
 
     @PostMapping
     public ResponseEntity<LenderResponse> create(@RequestBody CreateLenderRequest request) {
@@ -59,5 +62,18 @@ public class LenderController {
         log.info("LenderController::delete(id={})", id);
         lenderService.deleteLender(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{lenderId}/history")
+    public ResponseEntity<HistoryQueryResponse> getHistory(
+            @PathVariable UUID lenderId,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
+            @RequestParam(required = false) BigDecimal minValue,
+            @RequestParam(required = false) BigDecimal maxValue,
+            @RequestParam(required = false) String type) {
+        log.info("LenderController::getHistory(lenderId={})", lenderId);
+        return ResponseEntity.ok(transactionService.queryHistory(
+                lenderId, startDate, endDate, minValue, maxValue, type));
     }
 }

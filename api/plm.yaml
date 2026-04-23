@@ -232,6 +232,60 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /lenders/{lenderId}/history:
+    get:
+      summary: Query lender history
+      tags: [Lenders]
+      operationId: queryLenderHistory
+      parameters:
+        - name: lenderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: minValue
+          in: query
+          required: false
+          schema:
+            type: number
+        - name: maxValue
+          in: query
+          required: false
+          schema:
+            type: number
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [PAID_IN_FULL, FORGIVEN]
+      responses:
+        '200':
+          description: History retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoryQueryResponse'
+        '404':
+          description: Lender not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /lenders/{lenderId}/transactions:
     post:
       summary: Create a new transaction or cancel an existing one
@@ -483,3 +537,26 @@ components:
           type: string
           enum: [MONEY, WIRE_TRANSACTION, PHONE, OTHERS]
           description: Payment type (required for PAID_IN_FULL)
+    HistoryQueryResponse:
+      type: object
+      properties:
+        lender:
+          type: string
+        date:
+          type: string
+          format: date-time
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/HistoryItem'
+    HistoryItem:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        value:
+          type: number
+        type:
+          type: string
+          enum: [PAID_IN_FULL, FORGIVEN]
