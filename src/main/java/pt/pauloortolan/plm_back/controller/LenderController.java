@@ -45,4 +45,19 @@ public class LenderController {
         log.info("LenderController::getById(id={})", id);
         return ResponseEntity.ok(lenderService.getById(id));
     }
+
+    @PostMapping("/settle")
+    public ResponseEntity<Void> settle(@RequestBody SettleLenderRequest request) {
+        log.info("LenderController::settle(lenderId={}, settlementType={})", 
+                request.lenderId(), request.settlementType());
+        lenderService.settleLender(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        log.info("LenderController::delete(id={})", id);
+        lenderService.deleteLender(id);
+        return ResponseEntity.noContent().build();
+    }
 }

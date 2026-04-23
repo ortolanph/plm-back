@@ -7,10 +7,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pt.pauloortolan.plm_back.dto.*;
 import pt.pauloortolan.plm_back.mapper.LenderMapper;
-import pt.pauloortolan.plm_back.model.Lender;
+import pt.pauloortolan.plm_back.model.*;
 import pt.pauloortolan.plm_back.repository.LenderRepository;
+import pt.pauloortolan.plm_back.repository.TransactionHistoryRepository;
+import pt.pauloortolan.plm_back.repository.TransactionRepository;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,13 +30,19 @@ class LenderServiceTest {
     private LenderRepository repository;
 
     @Mock
+    private TransactionRepository transactionRepository;
+
+    @Mock
+    private TransactionHistoryRepository transactionHistoryRepository;
+
+    @Mock
     private LenderMapper mapper;
 
     private LenderService lenderService;
 
     @BeforeEach
     void setUp() {
-        lenderService = new LenderService(repository, mapper);
+        lenderService = new LenderService(repository, transactionRepository, transactionHistoryRepository, mapper);
     }
 
     @Test
@@ -188,5 +198,96 @@ class LenderServiceTest {
         lenderService.query(nameFilter, phoneFilter);
 
         verify(repository).findByFilters(nameFilter, phoneFilter);
+    }
+
+    @Test
+    void settleLender_success_movesTransactionsToHistory() {
+        UUID lenderId = UUID.randomUUID();
+        Lender lender = Lender.builder()
+                .id(lenderId)
+                .name("John Doe")
+                .phone("+1234567890")
+                .bankData("IBAN123")
+                .build();
+
+        Transaction borrowedTx = Transaction.builder()
+                .id(UUID.randomUUID())
+                .lender(lender)
+                .transactionDate(LocalDateTime.now())
+                .transactionValue(new BigDecimal("100.00"))
+                .transactionType(TransactionType.BORROWED)
+                .build();
+
+        Transaction paymentTx = Transaction.builder()
+                .id(UUID.randomUUID())
+                .lender(lender)
+                .transactionDate(LocalDateTime.now())
+                .transactionValue(new BigDecimal("30.00"))
+                .transactionType(TransactionType.PAYMENT)
+                .transactionPaymentType(TransactionPaymentType.MONEY)
+                .build();
+
+        SettleLenderRequest request = new SettleLenderRequest(
+                lenderId, HistoryType.PAID_IN_FULL, TransactionPaymentType.MONEY);
+
+        when(repository.findById(lenderId)).thenReturn(Optional.of(lender));
+        when(transactionRepository.findByLenderId(lenderId)).thenReturn(List.of(borrowedTx, paymentTx));
+
+        lenderService.settleLender(request);
+
+        verify(transactionHistoryRepository, times(3)).save(any(TransactionHistory.class));
+        verify(transactionRepository).deleteAll(List.of(borrowedTx, paymentTx));
+    }
+
+    @Test
+    void settleLender_notFound_throwsException() {
+        UUID lenderId = UUID.randomUUID();
+        SettleLenderRequest request = new SettleLenderRequest(
+                lenderId, HistoryType.PAID_IN_FULL, TransactionPaymentType.MONEY);
+
+        when(repository.findById(lenderId)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> lenderService.settleLender(request));
+    }
+
+    @Test
+    void deleteLender_success_deletesLender() {
+        UUID lenderId = UUID.randomUUID();
+        Lender lender = Lender.builder().id(lenderId).name("John Doe").build();
+
+        when(repository.findById(lenderId)).thenReturn(Optional.of(lender));
+        when(transactionRepository.findByLenderId(lenderId)).thenReturn(Collections.emptyList());
+
+        lenderService.deleteLender(lenderId);
+
+        verify(repository).delete(lender);
+    }
+
+    @Test
+    void deleteLender_withOpenTransactions_throwsException() {
+        UUID lenderId = UUID.randomUUID();
+        Lender lender = Lender.builder().id(lenderId).name("John Doe").build();
+
+        Transaction borrowedTx = Transaction.builder()
+                .id(UUID.randomUUID())
+                .lender(lender)
+                .transactionType(TransactionType.BORROWED)
+                .transactionValue(new BigDecimal("100.00"))
+                .build();
+
+        when(repository.findById(lenderId)).thenReturn(Optional.of(lender));
+        when(transactionRepository.findByLenderId(lenderId)).thenReturn(List.of(borrowedTx));
+
+        assertThrows(IllegalStateException.class, () -> lenderService.deleteLender(lenderId));
+        verify(repository, never()).delete(any(Lender.class));
+    }
+
+    @Test
+    void deleteLender_notFound_throwsException() {
+        UUID lenderId = UUID.randomUUID();
+
+        when(repository.findById(lenderId)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> lenderService.deleteLender(lenderId));
     }
 }

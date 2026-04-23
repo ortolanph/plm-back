@@ -1,0 +1,89 @@
+@baseUrl = http://localhost:9094
+@lenderId = 8af407c4-c00a-4f21-8f78-fff3d321bbfe
+@transactionCancelId = 9ea0a9dd-d5bc-483e-8af7-55e0ad813e14
+
+### Actuator
+GET {{baseUrl}}/actuator
+Accept: application/json
+
+### Create a Lender
+POST {{baseUrl}}/lenders
+Content-Type: application/json
+
+{
+  "name": "Bob Tester",
+  "phone": "+999999999999",
+  "bankData": "IBAN:CC0000000000",
+  "address": "0 Fools Street"
+}
+
+### Create transaction #1 BORROW  20
+POST {{baseUrl}}/lenders/{{lenderId}}/transactions
+Content-Type: application/json
+
+{
+  "idLender": "{{lenderId}}",
+  "transactionPaymentType": "MONEY",
+  "transactionType": "BORROWED",
+  "transactionValue": 20.0
+}
+
+### Create transaction #2 BORROW  30
+POST {{baseUrl}}/lenders/{{lenderId}}/transactions
+Content-Type: application/json
+
+{
+  "idLender": "{{lenderId}}",
+  "transactionPaymentType": "MONEY",
+  "transactionType": "BORROWED",
+  "transactionValue": 30.0
+}
+
+### Create transaction #3 BORROW  20
+POST {{baseUrl}}/lenders/{{lenderId}}/transactions
+Content-Type: application/json
+
+{
+  "idLender": "{{lenderId}}",
+  "transactionPaymentType": "MONEY",
+  "transactionType": "BORROWED",
+  "transactionValue": 20.0
+}
+
+### Create transaction #4 PAYED   20
+POST {{baseUrl}}/lenders/{{lenderId}}/transactions
+Content-Type: application/json
+
+{
+  "idLender": "{{lenderId}}",
+  "transactionPaymentType": "MONEY",
+  "transactionType": "PAYMENT",
+  "transactionValue": 20.0
+}
+
+### Cancel transaction #2 CANCEL 20
+POST {{baseUrl}}/lenders/{{lenderId}}/transactions
+Content-Type: application/json
+
+{
+  "cancelTransactionId": "{{transactionCancelId}}",
+  "idLender": "{{lenderId}}"
+}
+
+### Delete a lender - Failure
+DELETE {{baseUrl}}/lenders/{{lenderId}}
+Content-type: application/json
+
+### Settle a debt
+POST {{baseUrl}}/lenders/settle
+Content-Type: application/json
+
+{
+  "lenderId": "{{lenderId}}",
+  "settlementType": "PAID_IN_FULL",
+  "paymentType": "MONEY"
+}
+
+### Delete a lender - Success
+DELETE {{baseUrl}}/lenders/{{lenderId}}
+Content-type: application/json

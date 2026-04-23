@@ -139,6 +139,27 @@ paths:
                 items:
                   $ref: '#/components/schemas/LenderResponse'
 
+  /lenders/settle:
+    post:
+      summary: Settle a lender's debt
+      tags: [Lenders]
+      operationId: settleLender
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SettleLenderRequest'
+      responses:
+        '200':
+          description: Lender settled successfully
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /lenders/{id}:
     put:
       summary: Update a lender
@@ -164,6 +185,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LenderResponse'
+
+    delete:
+      summary: Delete a lender
+      tags: [Lenders]
+      operationId: deleteLender
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Lender deleted successfully
+        '400':
+          description: Cannot delete lender with open transactions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
     get:
       summary: Get a lender by ID
@@ -423,3 +465,21 @@ components:
         error:
           type: string
           description: Error description
+    SettleLenderRequest:
+      type: object
+      required:
+        - lenderId
+        - settlementType
+      properties:
+        lenderId:
+          type: string
+          format: uuid
+          description: Lender ID
+        settlementType:
+          type: string
+          enum: [PAID_IN_FULL, FORGIVEN]
+          description: Type of settlement
+        paymentType:
+          type: string
+          enum: [MONEY, WIRE_TRANSACTION, PHONE, OTHERS]
+          description: Payment type (required for PAID_IN_FULL)

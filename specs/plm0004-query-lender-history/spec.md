@@ -42,3 +42,9 @@ Format
 	]
 }
 ```
+
+## Acceptance Criteria
+
+1. Tests are implemented
+2. api/plm.yaml is updated
+3. Migrations are created if applicable
