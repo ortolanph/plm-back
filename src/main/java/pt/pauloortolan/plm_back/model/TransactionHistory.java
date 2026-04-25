@@ -2,9 +2,10 @@ package pt.pauloortolan.plm_back.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.UUID;
+
+import java.math.*;
+import java.time.*;
+import java.util.*;
 
 @Entity
 @Table(name = "transaction_history")
@@ -49,6 +50,9 @@ public class TransactionHistory {
     @Enumerated(EnumType.STRING)
     @Column(name = "history_type", nullable = false)
     private HistoryType historyType;
+
+    @Column(name = "lender_id")
+    private UUID lenderId;
 
     @PrePersist
     void onCreate() {

@@ -1,13 +1,11 @@
 package pt.pauloortolan.plm_back.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import pt.pauloortolan.plm_back.model.GeneratedCode;
+import org.springframework.data.jpa.repository.*;
+import org.springframework.data.repository.query.*;
+import pt.pauloortolan.plm_back.model.*;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
+import java.time.*;
+import java.util.*;
 
 public interface GeneratedCodeRepository extends JpaRepository<GeneratedCode, Long> {
 

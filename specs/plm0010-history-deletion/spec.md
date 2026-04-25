@@ -1,14 +1,10 @@
 # History deletion
 
-## ADDED Requirements
-
-### Requirement: History deletion
-
-The system must delete history records after one year.
+The system must be able to delete history records after one year.
 
 Create the unit tests for each scenario.
 
-### Requirement: Purge Expired History records
+## Requirement: Purge Expired History records
 
 - GIVEN the system has a scheduled task that runs every day
 - WHEN the scheduled task executes
@@ -19,3 +15,4 @@ Create the unit tests for each scenario.
 1. Tests are implemented
 2. API documentation (api/plm.yaml) is updated
 3. Migrations are created if applicable
+4. Create a new file on the `integration-tests` folder

@@ -1,14 +1,14 @@
 package pt.pauloortolan.plm_back.dto;
 
-import pt.pauloortolan.plm_back.model.TransactionPaymentType;
-import pt.pauloortolan.plm_back.model.TransactionType;
+import pt.pauloortolan.plm_back.model.*;
 
-import java.math.BigDecimal;
-import java.util.UUID;
+import java.math.*;
+import java.util.*;
 
 public record CreateTransactionRequest(
-        UUID idLender,
-        BigDecimal transactionValue,
-        TransactionType transactionType,
-        TransactionPaymentType transactionPaymentType,
-        UUID cancelTransactionId) {}
+    UUID idLender,
+    BigDecimal transactionValue,
+    TransactionType transactionType,
+    TransactionPaymentType transactionPaymentType,
+    UUID cancelTransactionId) {
+}

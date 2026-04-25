@@ -2,13 +2,13 @@ package pt.pauloortolan.plm_back.controller;
 
 import lombok.*;
 import lombok.extern.slf4j.*;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import pt.pauloortolan.plm_back.dto.*;
-import pt.pauloortolan.plm_back.service.LenderService;
+import pt.pauloortolan.plm_back.service.*;
 
-import java.util.List;
-import java.util.UUID;
+import java.math.*;
+import java.util.*;
 
 @Slf4j
 @RestController
@@ -17,6 +17,7 @@ import java.util.UUID;
 public class LenderController {
 
     private final LenderService lenderService;
+    private final TransactionService transactionService;
 
     @PostMapping
     public ResponseEntity<LenderResponse> create(@RequestBody CreateLenderRequest request) {
@@ -26,16 +27,16 @@ public class LenderController {
 
     @PutMapping("/{id}")
     public ResponseEntity<LenderResponse> update(
-            @PathVariable UUID id,
-            @RequestBody UpdateLenderRequest request) {
+        @PathVariable UUID id,
+        @RequestBody UpdateLenderRequest request) {
         log.info("LenderController::update(id={})", id);
         return ResponseEntity.ok(lenderService.update(id, request));
     }
 
     @GetMapping
     public ResponseEntity<List<LenderResponse>> query(
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String phone) {
+        @RequestParam(required = false) String name,
+        @RequestParam(required = false) String phone) {
         log.info("LenderController::query(name={}, phone={})", name, phone);
         return ResponseEntity.ok(lenderService.query(name, phone));
     }
@@ -48,8 +49,8 @@ public class LenderController {
 
     @PostMapping("/settle")
     public ResponseEntity<Void> settle(@RequestBody SettleLenderRequest request) {
-        log.info("LenderController::settle(lenderId={}, settlementType={})", 
-                request.lenderId(), request.settlementType());
+        log.info("LenderController::settle(lenderId={}, settlementType={})",
+            request.lenderId(), request.settlementType());
         lenderService.settleLender(request);
         return ResponseEntity.ok().build();
     }
@@ -59,5 +60,18 @@ public class LenderController {
         log.info("LenderController::delete(id={})", id);
         lenderService.deleteLender(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{lenderId}/history")
+    public ResponseEntity<HistoryQueryResponse> getHistory(
+        @PathVariable UUID lenderId,
+        @RequestParam(required = false) String startDate,
+        @RequestParam(required = false) String endDate,
+        @RequestParam(required = false) BigDecimal minValue,
+        @RequestParam(required = false) BigDecimal maxValue,
+        @RequestParam(required = false) String type) {
+        log.info("LenderController::getHistory(lenderId={})", lenderId);
+        return ResponseEntity.ok(transactionService.queryHistory(
+            lenderId, startDate, endDate, minValue, maxValue, type));
     }
 }

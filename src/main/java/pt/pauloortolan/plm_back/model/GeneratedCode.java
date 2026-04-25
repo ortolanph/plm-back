@@ -2,7 +2,8 @@ package pt.pauloortolan.plm_back.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
+
+import java.time.*;
 
 @Entity
 @Table(name = "generated_codes")

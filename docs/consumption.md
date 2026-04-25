@@ -1,19 +1,5 @@
 # Consumption
 
-## Master Table
-
-|            Use case            | Tokens used | Tokens Difference | Percentage used | Money Spent |
-|:------------------------------:|------------:|------------------:|----------------:|------------:|
-|         PLM-0000 `OTP`         |       48073 |                   |             24% |      $ 0.00 |
-|       PLM-0001 `Lenders`       |       73376 |             25303 |             37% |      $ 0.00 |
-| NO-FUNC - Convert to Mapstruct |      119783 |             46407 |             60% |      $ 0.00 |
-|     RESETED - New Session      |           0 |                 0 |               0 |           0 |
-|    PLM-0002 `Transactions`     |       72479 |                   |             36% |      $ 0.00 |
-|     RESETED - New Session      |           0 |                 0 |               0 |           0 |
-|   PLM-0003 `Debt Settlement`   |       43910 |                   |             22% |      $ 0.00 |
-|     RESETED - New Session      |           0 |                 0 |               0 |           0 |
-|    PLM-0004 `Query History`    |           0 |                 0 |             22% |      $ 0.00 |
-
 ## History Data
 
 ### PLM-0000 - Warmup
@@ -34,10 +20,22 @@
 * 60% used
 * $0.00 spent
 
+### RESET
+
+* 0 tokens
+* 0% used
+* $0.00 spent
+
 ### PLM-0002 - Transactions
 
 * 72,479 tokens
 * 36% used
+* $0.00 spent
+
+### RESET
+
+* 0 tokens
+* 0% used
 * $0.00 spent
 
 ### PLM-0003 - Settle a debt
@@ -46,9 +44,22 @@
 * 22% used
 * $0.00 spent
 
+### RESET
+
+* 0 tokens
+* 0% used
+* $0.00 spent
+
 ### PLM-0004 - Query Lender History
 
-* tokens
-* percentage
-* money spen
+* 84,524 tokens
+* 42% used
+* $0.00 spent
+* Notes: There were some bugs, on which I asked to fix.
+
+### RESET
+
+* 0 tokens
+* 0% used
+* $0.00 spent
 
