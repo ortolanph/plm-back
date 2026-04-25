@@ -15,4 +15,3 @@ Create the unit tests for each scenario.
 1. Tests are implemented
 2. API documentation (api/plm.yaml) is updated
 3. Migrations are created if applicable
-4. Create a new file on the `integration-tests` folder

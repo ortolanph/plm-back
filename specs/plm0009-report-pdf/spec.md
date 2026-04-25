@@ -37,3 +37,4 @@ Specific endpoint: `/reports/pdf`
 1. Tests are implemented
 2. API documentation (api/plm.yaml) is updated
 3. Migrations are created if applicable
+4. Add integration tests at the `integration-tests` folder
