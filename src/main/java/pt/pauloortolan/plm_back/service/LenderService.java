@@ -147,4 +147,46 @@ public class LenderService {
 
         repository.delete(lender);
     }
+
+    @Transactional(readOnly = true)
+    public LenderSummaryResponse getSummary(UUID lenderId) {
+        log.info("LenderService::getSummary(lenderId={})", lenderId);
+
+        Lender lender = repository.findById(lenderId)
+            .orElseThrow(() -> new IllegalArgumentException("Lender not found: " + lenderId));
+
+        List<Transaction> transactions = transactionRepository.findByLenderId(lenderId);
+        List<TransactionHistory> historyList = transactionHistoryRepository.findAll();
+
+        List<TransactionItem> transactionItems = transactions.stream()
+            .map(t -> new TransactionItem(
+                t.getTransactionDate(),
+                t.getTransactionValue(),
+                t.getTransactionType()))
+            .toList();
+
+        List<HistoryItem> historyItems = historyList.stream()
+            .filter(h -> h.getLenderId().equals(lenderId))
+            .map(h -> new HistoryItem(
+                h.getHistoryDate().toLocalDate().toString(),
+                h.getTransactionValue(),
+                h.getHistoryType().name()))
+            .toList();
+
+        BigDecimal total = BigDecimal.ZERO;
+        for (Transaction t : transactions) {
+            if (t.getTransactionType() == TransactionType.BORROWED) {
+                total = total.add(t.getTransactionValue());
+            } else if (t.getTransactionType() == TransactionType.PAYMENT) {
+                total = total.subtract(t.getTransactionValue());
+            }
+        }
+
+        return new LenderSummaryResponse(
+            total,
+            lender.getName(),
+            LocalDateTime.now().toString(),
+            transactionItems,
+            historyItems);
+    }
 }

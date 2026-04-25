@@ -1,0 +1,66 @@
+@baseUrl = http://localhost:9094
+@contentType = application/json
+@lenderId1 = d075681b-1f9e-4205-978f-5f5344d104a6
+
+
+### ============================================
+### LENDER SUMMARY TESTS
+### ============================================
+
+### Get summary for John Doe (already has settlements)
+GET {{baseUrl}}/lenders/{{lenderId1}}/summary
+Accept: {{contentType}}
+
+### Create new lender for summary test
+POST {{baseUrl}}/lenders
+Content-Type: {{contentType}}
+
+{
+  "name": "Test Summary Lender",
+  "phone": "+351944444444",
+  "bankData": "IBAN:PT000000000000000004",
+  "address": "100 New Street"
+}
+
+### Create transaction for new lender
+POST {{baseUrl}}/lenders/{{lenderId1}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "idLender": "{{lenderId1}}",
+  "transactionPaymentType": "MONEY",
+  "transactionType": "BORROWED",
+  "transactionValue": 200.00
+}
+
+### Get summary after new transaction
+GET {{baseUrl}}/lenders/{{lenderId1}}/summary
+Accept: {{contentType}}
+
+### Create payment transaction
+POST {{baseUrl}}/lenders/{{lenderId1}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "idLender": "{{lenderId1}}",
+  "transactionPaymentType": "MONEY",
+  "transactionType": "PAYMENT",
+  "transactionValue": 50.00
+}
+
+### Get summary after payment
+GET {{baseUrl}}/lenders/{{lenderId1}}/summary
+Accept: {{contentType}}
+
+### Cancel a transaction
+POST {{baseUrl}}/lenders/{{lenderId1}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "idLender": "{{lenderId1}}",
+  "cancelTransactionId": " tx-id-here "
+}
+
+### Get final summary
+GET {{baseUrl}}/lenders/{{lenderId1}}/summary
+Accept: {{contentType}}
