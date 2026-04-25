@@ -1,0 +1,92 @@
+@baseUrl = http://localhost:9094
+@contentType = application/json
+@lenderId1 = 6a3ee7fe-25b5-4e17-af7a-a2c5b790dd66
+
+
+### ============================================
+### CSV REPORT TESTS
+### ============================================
+
+### Get transaction CSV for John Doe
+GET {{baseUrl}}/reports/csv/transactions/{{lenderId1}}
+Accept: text/csv
+
+### Get history CSV for John Doe
+GET {{baseUrl}}/reports/csv/history/{{lenderId1}}
+Accept: text/csv
+
+### Get all reports (ZIP) for John Doe
+GET {{baseUrl}}/reports/csv/all/{{lenderId1}}
+Accept: application/zip
+
+### ============================================
+### CREATE LENDER FOR TEST
+### ============================================
+
+### Create new lender for CSV test
+POST {{baseUrl}}/lenders
+Content-Type: {{contentType}}
+
+{
+  "name": "CSV Test Lender",
+  "phone": "+351944444444",
+  "bankData": "IBAN:PT000000000000000004",
+  "address": "100 Test Street"
+}
+
+### Create transaction for new lender (save lenderId from response)
+@newLenderId = 87f4d3dc-1fcf-46d4-ab48-d50d9ffa2b0f
+
+### Get transaction CSV for new lender (use actual UUID from create response)
+GET {{baseUrl}}/reports/csv/transactions/{{lenderId1}}
+Accept: text/csv
+
+### Create borrowed transaction
+POST {{baseUrl}}/lenders/{{lenderId1}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "idLender": "{{lenderId1}}",
+  "transactionPaymentType": "MONEY",
+  "transactionType": "BORROWED",
+  "transactionValue": 500.00
+}
+
+### Get transaction CSV after new transaction
+GET {{baseUrl}}/reports/csv/transactions/{{lenderId1}}
+Accept: text/csv
+
+### Create payment transaction
+POST {{baseUrl}}/lenders/{{lenderId1}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "idLender": "{{lenderId1}}",
+  "transactionPaymentType": "WIRE_TRANSACTION",
+  "transactionType": "PAYMENT",
+  "transactionValue": 150.00
+}
+
+### Get transaction CSV after payment
+GET {{baseUrl}}/reports/csv/transactions/{{lenderId1}}
+Accept: text/csv
+
+### Get all reports (ZIP) with transactions
+GET {{baseUrl}}/reports/csv/all/{{lenderId1}}
+Accept: application/zip
+
+### ============================================
+### ERROR HANDLING TESTS
+### ============================================
+
+### Get transaction CSV for non-existent lender
+GET {{baseUrl}}/reports/csv/transactions/6a3ee7fe-25b5-4e17-af7a-a2c5b790dd66
+Accept: text/csv
+
+### Get history CSV for non-existent lender
+GET {{baseUrl}}/reports/csv/history/6a3ee7fe-25b5-4e17-af7a-a2c5b790dd66
+Accept: text/csv
+
+### Get all reports for non-existent lender
+GET {{baseUrl}}/reports/csv/all/6a3ee7fe-25b5-4e17-af7a-a2c5b790dd66
+Accept: application/zip

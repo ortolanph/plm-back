@@ -9,6 +9,8 @@ import java.util.*;
 
 public interface TransactionHistoryRepository extends JpaRepository<TransactionHistory, UUID>, JpaSpecificationExecutor<TransactionHistory> {
 
+    List<TransactionHistory> findByLenderId(UUID lenderId);
+
     default List<TransactionHistory> findByFilters(UUID lenderId, LocalDateTime startDate, LocalDateTime endDate,
                                                    BigDecimal minValue, BigDecimal maxValue, HistoryType type) {
         return findAll((root, query, cb) -> {
