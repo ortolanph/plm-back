@@ -289,4 +289,58 @@ class LenderServiceTest {
 
         assertThrows(IllegalArgumentException.class, () -> lenderService.deleteLender(lenderId));
     }
+
+    @Test
+    void getSummary_success_returnsSummary() {
+        UUID lenderId = UUID.randomUUID();
+        Lender lender = Lender.builder()
+            .id(lenderId)
+            .name("John Doe")
+            .build();
+
+        Transaction borrowedTx = Transaction.builder()
+            .id(UUID.randomUUID())
+            .lender(lender)
+            .transactionDate(LocalDateTime.now())
+            .transactionValue(new BigDecimal("100.00"))
+            .transactionType(TransactionType.BORROWED)
+            .build();
+
+        Transaction paymentTx = Transaction.builder()
+            .id(UUID.randomUUID())
+            .lender(lender)
+            .transactionDate(LocalDateTime.now())
+            .transactionValue(new BigDecimal("50.00"))
+            .transactionType(TransactionType.PAYMENT)
+            .build();
+
+        TransactionHistory history = TransactionHistory.builder()
+            .id(UUID.randomUUID())
+            .lenderId(lenderId)
+            .historyDate(LocalDateTime.now())
+            .transactionValue(new BigDecimal("100.00"))
+            .historyType(HistoryType.PAID_IN_FULL)
+            .build();
+
+        when(repository.findById(lenderId)).thenReturn(Optional.of(lender));
+        when(transactionRepository.findByLenderId(lenderId)).thenReturn(List.of(borrowedTx, paymentTx));
+        when(transactionHistoryRepository.findAll()).thenReturn(List.of(history));
+
+        LenderSummaryResponse response = lenderService.getSummary(lenderId);
+
+        assertNotNull(response);
+        assertEquals("John Doe", response.lender());
+        assertEquals(new BigDecimal("50.00"), response.total());
+        assertEquals(2, response.transactions().size());
+        assertEquals(1, response.history().size());
+    }
+
+    @Test
+    void getSummary_notFound_throwsException() {
+        UUID lenderId = UUID.randomUUID();
+
+        when(repository.findById(lenderId)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> lenderService.getSummary(lenderId));
+    }
 }

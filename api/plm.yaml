@@ -286,6 +286,32 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /lenders/{lenderId}/summary:
+    get:
+      summary: Get lender summary
+      tags: [Lenders]
+      operationId: getLenderSummary
+      parameters:
+        - name: lenderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Summary retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LenderSummaryResponse'
+        '404':
+          description: Lender not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /lenders/{lenderId}/transactions:
     post:
       summary: Create a new transaction or cancel an existing one
@@ -560,3 +586,21 @@ components:
         type:
           type: string
           enum: [PAID_IN_FULL, FORGIVEN]
+    LenderSummaryResponse:
+      type: object
+      properties:
+        total:
+          type: number
+        lender:
+          type: string
+        date:
+          type: string
+          format: date-time
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionItem'
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/HistoryItem'

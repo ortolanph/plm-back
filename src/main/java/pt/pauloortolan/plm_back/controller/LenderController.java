@@ -74,4 +74,10 @@ public class LenderController {
         return ResponseEntity.ok(transactionService.queryHistory(
             lenderId, startDate, endDate, minValue, maxValue, type));
     }
+
+    @GetMapping("/{lenderId}/summary")
+    public ResponseEntity<LenderSummaryResponse> getSummary(@PathVariable UUID lenderId) {
+        log.info("LenderController::getSummary(lenderId={})", lenderId);
+        return ResponseEntity.ok(lenderService.getSummary(lenderId));
+    }
 }
