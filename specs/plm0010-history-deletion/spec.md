@@ -1,5 +1,7 @@
 # History deletion
 
+This is a Spring Boot project in the Java programming language. This uses project Gradle to manage dependencies and build the project.
+
 The system must be able to delete history records after one year.
 
 Create the unit tests for each scenario.

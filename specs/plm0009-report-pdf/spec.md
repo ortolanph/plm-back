@@ -1,6 +1,6 @@
 # Generate PDF Report
 
-This is a Spring Boot project in the Java programming language. This uses gradle to manage depenencies and build the project.
+This is a Spring Boot project in the Java programming language. This uses project Gradle to manage dependencies and build the project.
 
 ## ADDED Requirements
 
