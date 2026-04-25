@@ -52,8 +52,8 @@
 
 ### PLM-0004 - Query Lender History
 
-* 84,524 tokens
-* 42% used
+* 106,925 tokens
+* 53% used
 * $0.00 spent
 * Notes: There were some bugs, on which I asked to fix.
 
