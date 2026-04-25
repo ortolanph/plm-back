@@ -69,9 +69,9 @@
 * 29% used
 * $0.00 spent
 
-### RESET
+### PLM-0006 - Debts
 
-* 0 tokens
-* 0% used
+* 58,260 tokens
+* 29% used
 * $0.00 spent
 

@@ -1,0 +1,72 @@
+@baseUrl = http://localhost:9094
+@contentType = application/json
+
+
+### ============================================
+### DEBTS REPORT TESTS
+### ============================================
+
+### Get all debts report
+GET {{baseUrl}}/debts
+Accept: {{contentType}}
+
+### Create lender 1
+POST {{baseUrl}}/lenders
+Content-Type: {{contentType}}
+
+{
+  "name": "John Doe",
+  "phone": "+351911111111",
+  "bankData": "IBAN:PT000000000000000001"
+}
+
+### Create lender 2
+POST {{baseUrl}}/lenders
+Content-Type: {{contentType}}
+
+{
+  "name": "Jane Doe",
+  "phone": "+351922222222",
+  "bankData": "IBAN:PT000000000000000002"
+}
+
+### Create borrowed transaction for lender 1
+POST {{baseUrl}}/lenders/3c16a326-b805-4b1c-9a04-3cf02810ea23/transactions
+Content-Type: {{contentType}}
+
+{
+  "idLender": "3c16a326-b805-4b1c-9a04-3cf02810ea23",
+  "transactionValue": 3000,
+  "transactionType": "BORROWED",
+  "transactionPaymentType": "MONEY"
+}
+
+### Create borrowed transaction for lender 2
+POST {{baseUrl}}/lenders/edaed615-4b59-4d20-96e3-52fd5b40a93d/transactions
+Content-Type: {{contentType}}
+
+{
+  "idLender": "edaed615-4b59-4d20-96e3-52fd5b40a93d",
+  "transactionValue": 2000,
+  "transactionType": "BORROWED",
+  "transactionPaymentType": "WIRE_TRANSACTION"
+}
+
+### Get debts report (should show totalDebt: 5000)
+GET {{baseUrl}}/debts
+Accept: {{contentType}}
+
+### Create payment for lender 1
+POST {{baseUrl}}/lenders/3c16a326-b805-4b1c-9a04-3cf02810ea23/transactions
+Content-Type: {{contentType}}
+
+{
+  "idLender": "3c16a326-b805-4b1c-9a04-3cf02810ea23",
+  "transactionValue": 500,
+  "transactionType": "PAYMENT",
+  "transactionPaymentType": "MONEY"
+}
+
+### Get updated debts report (should show totalDebt: 4500)
+GET {{baseUrl}}/debts
+Accept: {{contentType}}

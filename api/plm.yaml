@@ -16,6 +16,8 @@ tags:
     description: Lender management operations
   - name: Transactions
     description: Transaction management operations
+  - name: Debts
+    description: Debt reporting operations
 
 paths:
   /codes/generate:
@@ -385,6 +387,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/TransactionQueryResponse'
 
+  /debts:
+    get:
+      summary: Get all debts report
+      tags: [Debts]
+      operationId: getDebts
+      responses:
+        '200':
+          description: Debts report retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtsResponse'
+
 components:
   schemas:
     GenerateResponse:
@@ -483,7 +498,6 @@ components:
           type: string
           format: uuid
           description: Transaction ID to cancel (when provided, creates a CANCELLED transaction)
-
     CancelTransactionRequest:
       type: object
       required:
@@ -493,7 +507,6 @@ components:
           type: string
           format: uuid
           description: Transaction ID to cancel (deprecated, use CreateTransactionRequest with cancelTransactionId)
-
     TransactionResponse:
       type: object
       properties:
@@ -604,3 +617,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/HistoryItem'
+    DebtsResponse:
+      type: object
+      properties:
+        totalDebt:
+          type: number
+          description: Total debt amount
+        date:
+          type: string
+          format: date-time
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/DebtDetail'
+    DebtDetail:
+      type: object
+      properties:
+        lender:
+          type: string
+          description: Lender name
+        total:
+          type: number
+          description: Total debt for this lender
