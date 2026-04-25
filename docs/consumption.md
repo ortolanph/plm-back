@@ -63,3 +63,15 @@
 * 0% used
 * $0.00 spent
 
+### PLM-0005 - Lender Summary
+
+* 57,635 tokens
+* 29% used
+* $0.00 spent
+
+### RESET
+
+* 0 tokens
+* 0% used
+* $0.00 spent
+
