@@ -12,6 +12,7 @@ import pt.pauloortolan.plm_back.repository.*;
 import java.math.*;
 import java.time.*;
 import java.util.*;
+import java.util.stream.*;
 
 @Slf4j
 @Service
@@ -188,5 +189,40 @@ public class LenderService {
             LocalDateTime.now().toString(),
             transactionItems,
             historyItems);
+    }
+
+    @Transactional(readOnly = true)
+    public DebtsResponse getDebts() {
+        log.info("LenderService::getDebts()");
+
+        List<Lender> lenders = repository.findAll();
+        List<Transaction> transactions = transactionRepository.findAll();
+
+        BigDecimal totalDebt = BigDecimal.ZERO;
+        List<DebtsResponse.DebtDetail> details = new ArrayList<>();
+
+        for (Lender lender : lenders) {
+            BigDecimal lenderDebt = BigDecimal.ZERO;
+            for (Transaction t : transactions) {
+                if (t.getLender().getId().equals(lender.getId())) {
+                    if (t.getTransactionType() == TransactionType.BORROWED) {
+                        lenderDebt = lenderDebt.add(t.getTransactionValue());
+                    } else if (t.getTransactionType() == TransactionType.PAYMENT) {
+                        lenderDebt = lenderDebt.subtract(t.getTransactionValue());
+                    }
+                }
+            }
+            if (lenderDebt.compareTo(BigDecimal.ZERO) > 0) {
+                details.add(new DebtsResponse.DebtDetail(lender.getName(), lenderDebt));
+                totalDebt = totalDebt.add(lenderDebt);
+            }
+        }
+
+        details.sort((a, b) -> b.total().compareTo(a.total()));
+
+        return new DebtsResponse(
+            totalDebt,
+            LocalDateTime.now().toString(),
+            details);
     }
 }

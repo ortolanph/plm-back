@@ -16,6 +16,7 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -342,5 +343,100 @@ class LenderServiceTest {
         when(repository.findById(lenderId)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () -> lenderService.getSummary(lenderId));
+    }
+
+    @Test
+    void getDebts_success_returnsDebtsReport() {
+        UUID lenderId1 = UUID.randomUUID();
+        UUID lenderId2 = UUID.randomUUID();
+
+        Lender lender1 = Lender.builder()
+            .id(lenderId1)
+            .name("John Doe")
+            .build();
+
+        Lender lender2 = Lender.builder()
+            .id(lenderId2)
+            .name("Jane Doe")
+            .build();
+
+        Transaction borrowedTx1 = Transaction.builder()
+            .id(UUID.randomUUID())
+            .lender(lender1)
+            .transactionDate(LocalDateTime.now())
+            .transactionValue(new BigDecimal("3000.00"))
+            .transactionType(TransactionType.BORROWED)
+            .build();
+
+        Transaction paymentTx1 = Transaction.builder()
+            .id(UUID.randomUUID())
+            .lender(lender1)
+            .transactionDate(LocalDateTime.now())
+            .transactionValue(new BigDecimal("500.00"))
+            .transactionType(TransactionType.PAYMENT)
+            .build();
+
+        Transaction borrowedTx2 = Transaction.builder()
+            .id(UUID.randomUUID())
+            .lender(lender2)
+            .transactionDate(LocalDateTime.now())
+            .transactionValue(new BigDecimal("2000.00"))
+            .transactionType(TransactionType.BORROWED)
+            .build();
+
+        when(repository.findAll()).thenReturn(List.of(lender1, lender2));
+        when(transactionRepository.findAll()).thenReturn(List.of(borrowedTx1, paymentTx1, borrowedTx2));
+
+        DebtsResponse response = lenderService.getDebts();
+
+        assertNotNull(response);
+        assertEquals(new BigDecimal("4500.00"), response.totalDebt());
+        assertEquals(2, response.details().size());
+        assertEquals("John Doe", response.details().getFirst().lender());
+        assertEquals(new BigDecimal("2500.00"), response.details().getFirst().total());
+    }
+
+    @Test
+    void getDebts_noDebts_returnsEmptyDetails() {
+        Lender lender = Lender.builder()
+            .id(UUID.randomUUID())
+            .name("John Doe")
+            .build();
+
+        when(repository.findAll()).thenReturn(List.of(lender));
+        when(transactionRepository.findAll()).thenReturn(Collections.emptyList());
+
+        DebtsResponse response = lenderService.getDebts();
+
+        assertNotNull(response);
+        assertEquals(BigDecimal.ZERO, response.totalDebt());
+        assertTrue(response.details().isEmpty());
+    }
+
+    @Test
+    void getDebts_lenderWithOnlyPayments_returnsNoDebt() {
+        UUID lenderId = UUID.randomUUID();
+
+        Lender lender = Lender.builder()
+            .id(lenderId)
+            .name("John Doe")
+            .build();
+
+        Transaction paymentTx = Transaction.builder()
+            .id(UUID.randomUUID())
+            .lender(lender)
+            .transactionDate(LocalDateTime.now())
+            .transactionValue(new BigDecimal("1000.00"))
+            .transactionType(TransactionType.PAYMENT)
+            .build();
+
+        when(repository.findAll()).thenReturn(List.of(lender));
+        when(transactionRepository.findAll()).thenReturn(List.of(paymentTx));
+
+        DebtsResponse response = lenderService.getDebts();
+
+        assertNotNull(response);
+        assertEquals(BigDecimal.ZERO, response.totalDebt());
+        assertTrue(response.details().isEmpty());
     }
 }
