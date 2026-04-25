@@ -1,5 +1,7 @@
 # Generate Excel Report
 
+This is a Spring Boot project in the Java programming language. This uses gradle to manage depenencies and build the project.
+
 ## ADDED Requirements
 
 ### Requirement: Personal Loan Report
@@ -35,3 +37,10 @@ The system must be able to create an ODS report of the user information
 2. API documentation (api/plm.yaml) is updated
 3. Migrations are created if applicable
 4. Add integration tests at the `integration-tests` folder
+5. Consider using Apache POI lib for generating these two formats.
+
+## Tips
+
+1. I've added Spring Boot Starter Freemarker dependency
+2. There's a directory for template on the path `src/main/resources/templates`
+3. Feel free to use it to store templates

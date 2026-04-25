@@ -38,3 +38,14 @@ spring:
     enabled: true
     validate-on-migrate: true
     locations: classpath:db/migrations
+  freemarker:
+    template-loader-path: classpath:/templates/
+    suffix: .ftl
+    cache: false  # Set to true in production
+    charset: UTF-8
+    content-type: text/html
+    settings:
+      number_format: "0.##"
+      date_format: "yyyy-MM-dd"
+      time_format: "HH:mm:ss"
+      datetime_format: "yyyy-MM-dd HH:mm:ss"

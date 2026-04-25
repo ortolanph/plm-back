@@ -1,5 +1,7 @@
 # Generate PDF Report
 
+This is a Spring Boot project in the Java programming language. This uses gradle to manage depenencies and build the project.
+
 ## ADDED Requirements
 
 ### Requirement: Personal Loan Report
@@ -38,3 +40,11 @@ Specific endpoint: `/reports/pdf`
 2. API documentation (api/plm.yaml) is updated
 3. Migrations are created if applicable
 4. Add integration tests at the `integration-tests` folder
+5. For generating PDF consider using itext library
+6. For generating DOC and ODT consider using Apache POI
+
+## Tips
+
+1. I've added Spring Boot Starter Freemarker dependency
+2. There's a directory for template on the path `src/main/resources/templates`
+3. Feel free to use it to store templates
