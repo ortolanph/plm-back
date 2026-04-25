@@ -1,0 +1,54 @@
+package pt.pauloortolan.plm_back.controller;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
+import pt.pauloortolan.plm_back.service.ReportService;
+
+import java.util.*;
+
+@Slf4j
+@RestController
+@RequestMapping("/reports")
+@RequiredArgsConstructor
+public class ReportController {
+
+    private final ReportService reportService;
+
+    @GetMapping("/csv/transactions/{lenderId}")
+    public ResponseEntity<byte[]> getTransactionCsv(@PathVariable UUID lenderId) {
+        log.info("ReportController::getTransactionCsv(lenderId={})", lenderId);
+        byte[] csvContent = reportService.generateTransactionCsv(lenderId);
+        String fileName = reportService.getTransactionFileName(lenderId);
+
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+            .contentType(MediaType.parseMediaType("text/csv"))
+            .body(csvContent);
+    }
+
+    @GetMapping("/csv/history/{lenderId}")
+    public ResponseEntity<byte[]> getHistoryCsv(@PathVariable UUID lenderId) {
+        log.info("ReportController::getHistoryCsv(lenderId={})", lenderId);
+        byte[] csvContent = reportService.generateHistoryCsv(lenderId);
+        String fileName = reportService.getHistoryFileName(lenderId);
+
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+            .contentType(MediaType.parseMediaType("text/csv"))
+            .body(csvContent);
+    }
+
+    @GetMapping("/csv/all/{lenderId}")
+    public ResponseEntity<byte[]> getAllReports(@PathVariable UUID lenderId) {
+        log.info("ReportController::getAllReports(lenderId={})", lenderId);
+        byte[] zipContent = reportService.generateZipReport(lenderId);
+        String fileName = reportService.getZipFileName(lenderId);
+
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+            .contentType(MediaType.parseMediaType("application/zip"))
+            .body(zipContent);
+    }
+}
