@@ -1,26 +1,25 @@
 package pt.pauloortolan.plm_back.service;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.*;
+import org.mockito.*;
+import org.mockito.junit.jupiter.*;
 import pt.pauloortolan.plm_back.dto.*;
-import pt.pauloortolan.plm_back.mapper.TransactionMapper;
+import pt.pauloortolan.plm_back.mapper.*;
 import pt.pauloortolan.plm_back.model.*;
-import pt.pauloortolan.plm_back.repository.LenderRepository;
-import pt.pauloortolan.plm_back.repository.TransactionHistoryRepository;
-import pt.pauloortolan.plm_back.repository.TransactionRepository;
+import pt.pauloortolan.plm_back.repository.*;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.math.*;
+import java.time.*;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TransactionServiceTest {
@@ -48,29 +47,29 @@ class TransactionServiceTest {
     void create_borrowed_success_returnsTransactionResponse() {
         UUID lenderId = UUID.randomUUID();
         CreateTransactionRequest request = new CreateTransactionRequest(
-                lenderId, 
-                new BigDecimal("100.00"), 
-                TransactionType.BORROWED, 
-                TransactionPaymentType.MONEY,
-                null);
+            lenderId,
+            new BigDecimal("100.00"),
+            TransactionType.BORROWED,
+            TransactionPaymentType.MONEY,
+            null);
 
         Lender lender = Lender.builder().id(lenderId).name("John Doe").build();
         Transaction transaction = Transaction.builder()
-                .id(UUID.randomUUID())
-                .lender(lender)
-                .transactionDate(LocalDateTime.now())
-                .transactionValue(new BigDecimal("100.00"))
-                .transactionType(TransactionType.BORROWED)
-                .transactionPaymentType(TransactionPaymentType.MONEY)
-                .build();
+            .id(UUID.randomUUID())
+            .lender(lender)
+            .transactionDate(LocalDateTime.now())
+            .transactionValue(new BigDecimal("100.00"))
+            .transactionType(TransactionType.BORROWED)
+            .transactionPaymentType(TransactionPaymentType.MONEY)
+            .build();
 
         TransactionResponse expectedResponse = new TransactionResponse(
-                transaction.getId(),
-                lenderId,
-                transaction.getTransactionDate(),
-                new BigDecimal("100.00"),
-                TransactionType.BORROWED,
-                TransactionPaymentType.MONEY);
+            transaction.getId(),
+            lenderId,
+            transaction.getTransactionDate(),
+            new BigDecimal("100.00"),
+            TransactionType.BORROWED,
+            TransactionPaymentType.MONEY);
 
         when(lenderRepository.findById(lenderId)).thenReturn(Optional.of(lender));
         when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
@@ -87,29 +86,29 @@ class TransactionServiceTest {
     void create_payment_success_returnsTransactionResponse() {
         UUID lenderId = UUID.randomUUID();
         CreateTransactionRequest request = new CreateTransactionRequest(
-                lenderId,
-                new BigDecimal("50.00"),
-                TransactionType.PAYMENT,
-                TransactionPaymentType.WIRE_TRANSACTION,
-                null);
+            lenderId,
+            new BigDecimal("50.00"),
+            TransactionType.PAYMENT,
+            TransactionPaymentType.WIRE_TRANSACTION,
+            null);
 
         Lender lender = Lender.builder().id(lenderId).name("John Doe").build();
         Transaction transaction = Transaction.builder()
-                .id(UUID.randomUUID())
-                .lender(lender)
-                .transactionDate(LocalDateTime.now())
-                .transactionValue(new BigDecimal("50.00"))
-                .transactionType(TransactionType.PAYMENT)
-                .transactionPaymentType(TransactionPaymentType.WIRE_TRANSACTION)
-                .build();
+            .id(UUID.randomUUID())
+            .lender(lender)
+            .transactionDate(LocalDateTime.now())
+            .transactionValue(new BigDecimal("50.00"))
+            .transactionType(TransactionType.PAYMENT)
+            .transactionPaymentType(TransactionPaymentType.WIRE_TRANSACTION)
+            .build();
 
         TransactionResponse expectedResponse = new TransactionResponse(
-                transaction.getId(),
-                lenderId,
-                transaction.getTransactionDate(),
-                new BigDecimal("50.00"),
-                TransactionType.PAYMENT,
-                TransactionPaymentType.WIRE_TRANSACTION);
+            transaction.getId(),
+            lenderId,
+            transaction.getTransactionDate(),
+            new BigDecimal("50.00"),
+            TransactionType.PAYMENT,
+            TransactionPaymentType.WIRE_TRANSACTION);
 
         when(lenderRepository.findById(lenderId)).thenReturn(Optional.of(lender));
         when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
@@ -125,11 +124,11 @@ class TransactionServiceTest {
     void create_lenderNotFound_throwsException() {
         UUID lenderId = UUID.randomUUID();
         CreateTransactionRequest request = new CreateTransactionRequest(
-                lenderId,
-                new BigDecimal("100.00"),
-                TransactionType.BORROWED,
-                null,
-                null);
+            lenderId,
+            new BigDecimal("100.00"),
+            TransactionType.BORROWED,
+            null,
+            null);
 
         when(lenderRepository.findById(lenderId)).thenReturn(Optional.empty());
 
@@ -141,38 +140,38 @@ class TransactionServiceTest {
         UUID transactionId = UUID.randomUUID();
         UUID lenderId = UUID.randomUUID();
         CreateTransactionRequest request = new CreateTransactionRequest(
-                lenderId,
-                null,
-                null,
-                null,
-                transactionId);
+            lenderId,
+            null,
+            null,
+            null,
+            transactionId);
 
         Lender lender = Lender.builder().id(lenderId).name("John Doe").build();
         Transaction originalTransaction = Transaction.builder()
-                .id(transactionId)
-                .lender(lender)
-                .transactionDate(LocalDateTime.now())
-                .transactionValue(new BigDecimal("100.00"))
-                .transactionType(TransactionType.BORROWED)
-                .transactionPaymentType(TransactionPaymentType.MONEY)
-                .build();
+            .id(transactionId)
+            .lender(lender)
+            .transactionDate(LocalDateTime.now())
+            .transactionValue(new BigDecimal("100.00"))
+            .transactionType(TransactionType.BORROWED)
+            .transactionPaymentType(TransactionPaymentType.MONEY)
+            .build();
 
         Transaction cancelledTransaction = Transaction.builder()
-                .id(UUID.randomUUID())
-                .lender(lender)
-                .transactionDate(LocalDateTime.now())
-                .transactionValue(new BigDecimal("100.00"))
-                .transactionType(TransactionType.CANCELLED)
-                .transactionPaymentType(TransactionPaymentType.MONEY)
-                .build();
+            .id(UUID.randomUUID())
+            .lender(lender)
+            .transactionDate(LocalDateTime.now())
+            .transactionValue(new BigDecimal("100.00"))
+            .transactionType(TransactionType.CANCELLED)
+            .transactionPaymentType(TransactionPaymentType.MONEY)
+            .build();
 
         TransactionResponse expectedResponse = new TransactionResponse(
-                cancelledTransaction.getId(),
-                lenderId,
-                cancelledTransaction.getTransactionDate(),
-                new BigDecimal("100.00"),
-                TransactionType.CANCELLED,
-                TransactionPaymentType.MONEY);
+            cancelledTransaction.getId(),
+            lenderId,
+            cancelledTransaction.getTransactionDate(),
+            new BigDecimal("100.00"),
+            TransactionType.CANCELLED,
+            TransactionPaymentType.MONEY);
 
         when(lenderRepository.findById(lenderId)).thenReturn(Optional.of(lender));
         when(transactionRepository.findById(transactionId)).thenReturn(Optional.of(originalTransaction));
@@ -190,21 +189,21 @@ class TransactionServiceTest {
         UUID transactionId = UUID.randomUUID();
         UUID lenderId = UUID.randomUUID();
         CreateTransactionRequest request = new CreateTransactionRequest(
-                lenderId,
-                null,
-                null,
-                null,
-                transactionId);
+            lenderId,
+            null,
+            null,
+            null,
+            transactionId);
 
         Lender lender = Lender.builder().id(lenderId).name("John Doe").build();
         Transaction alreadyCancelled = Transaction.builder()
-                .id(transactionId)
-                .lender(lender)
-                .transactionDate(LocalDateTime.now())
-                .transactionValue(new BigDecimal("100.00"))
-                .transactionType(TransactionType.CANCELLED)
-                .transactionPaymentType(TransactionPaymentType.MONEY)
-                .build();
+            .id(transactionId)
+            .lender(lender)
+            .transactionDate(LocalDateTime.now())
+            .transactionValue(new BigDecimal("100.00"))
+            .transactionType(TransactionType.CANCELLED)
+            .transactionPaymentType(TransactionPaymentType.MONEY)
+            .build();
 
         when(lenderRepository.findById(lenderId)).thenReturn(Optional.of(lender));
         when(transactionRepository.findById(transactionId)).thenReturn(Optional.of(alreadyCancelled));
@@ -217,11 +216,11 @@ class TransactionServiceTest {
         UUID transactionId = UUID.randomUUID();
         UUID lenderId = UUID.randomUUID();
         CreateTransactionRequest request = new CreateTransactionRequest(
-                lenderId,
-                null,
-                null,
-                null,
-                transactionId);
+            lenderId,
+            null,
+            null,
+            null,
+            transactionId);
 
         Lender lender = Lender.builder().id(lenderId).name("John Doe").build();
 
@@ -237,27 +236,27 @@ class TransactionServiceTest {
         Lender lender = Lender.builder().id(lenderId).name("John Doe").build();
 
         Transaction t1 = Transaction.builder()
-                .id(UUID.randomUUID())
-                .lender(lender)
-                .transactionDate(LocalDateTime.now())
-                .transactionValue(new BigDecimal("100.00"))
-                .transactionType(TransactionType.BORROWED)
-                .build();
+            .id(UUID.randomUUID())
+            .lender(lender)
+            .transactionDate(LocalDateTime.now())
+            .transactionValue(new BigDecimal("100.00"))
+            .transactionType(TransactionType.BORROWED)
+            .build();
 
         Transaction t2 = Transaction.builder()
-                .id(UUID.randomUUID())
-                .lender(lender)
-                .transactionDate(LocalDateTime.now())
-                .transactionValue(new BigDecimal("50.00"))
-                .transactionType(TransactionType.PAYMENT)
-                .build();
+            .id(UUID.randomUUID())
+            .lender(lender)
+            .transactionDate(LocalDateTime.now())
+            .transactionValue(new BigDecimal("50.00"))
+            .transactionType(TransactionType.PAYMENT)
+            .build();
 
         when(lenderRepository.findById(lenderId)).thenReturn(Optional.of(lender));
         when(transactionRepository.findByFilters(eq(lenderId), any(), any(), any(), any(), any()))
-                .thenReturn(List.of(t1, t2));
+            .thenReturn(List.of(t1, t2));
 
         TransactionQueryResponse response = transactionService.query(
-                lenderId, null, null, null, null, null);
+            lenderId, null, null, null, null, null);
 
         assertNotNull(response);
         assertEquals(2, response.transactions().size());
@@ -271,7 +270,7 @@ class TransactionServiceTest {
         when(lenderRepository.findById(lenderId)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () -> transactionService.query(
-                lenderId, null, null, null, null, null));
+            lenderId, null, null, null, null, null));
     }
 
     @Test
@@ -280,27 +279,27 @@ class TransactionServiceTest {
         Lender lender = Lender.builder().id(lenderId).name("John Doe").build();
 
         TransactionHistory h1 = TransactionHistory.builder()
-                .id(UUID.randomUUID())
-                .lenderName("John Doe")
-                .historyDate(LocalDateTime.now())
-                .transactionValue(new BigDecimal("100.00"))
-                .historyType(HistoryType.PAID_IN_FULL)
-                .build();
+            .id(UUID.randomUUID())
+            .lenderName("John Doe")
+            .historyDate(LocalDateTime.now())
+            .transactionValue(new BigDecimal("100.00"))
+            .historyType(HistoryType.PAID_IN_FULL)
+            .build();
 
         TransactionHistory h2 = TransactionHistory.builder()
-                .id(UUID.randomUUID())
-                .lenderName("John Doe")
-                .historyDate(LocalDateTime.now())
-                .transactionValue(new BigDecimal("200.00"))
-                .historyType(HistoryType.FORGIVEN)
-                .build();
+            .id(UUID.randomUUID())
+            .lenderName("John Doe")
+            .historyDate(LocalDateTime.now())
+            .transactionValue(new BigDecimal("200.00"))
+            .historyType(HistoryType.FORGIVEN)
+            .build();
 
         when(lenderRepository.findById(lenderId)).thenReturn(Optional.of(lender));
         when(transactionHistoryRepository.findByFilters(eq(lenderId), any(), any(), any(), any(), any()))
-                .thenReturn(List.of(h1, h2));
+            .thenReturn(List.of(h1, h2));
 
         HistoryQueryResponse response = transactionService.queryHistory(
-                lenderId, null, null, null, null, null);
+            lenderId, null, null, null, null, null);
 
         assertNotNull(response);
         assertEquals(2, response.history().size());
@@ -314,7 +313,7 @@ class TransactionServiceTest {
         when(lenderRepository.findById(lenderId)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () -> transactionService.queryHistory(
-                lenderId, null, null, null, null, null));
+            lenderId, null, null, null, null, null));
     }
 
     @Test
@@ -323,22 +322,22 @@ class TransactionServiceTest {
         Lender lender = Lender.builder().id(lenderId).name("John Doe").build();
 
         TransactionHistory h1 = TransactionHistory.builder()
-                .id(UUID.randomUUID())
-                .lenderName("John Doe")
-                .historyDate(LocalDateTime.now())
-                .transactionValue(new BigDecimal("100.00"))
-                .historyType(HistoryType.PAID_IN_FULL)
-                .build();
+            .id(UUID.randomUUID())
+            .lenderName("John Doe")
+            .historyDate(LocalDateTime.now())
+            .transactionValue(new BigDecimal("100.00"))
+            .historyType(HistoryType.PAID_IN_FULL)
+            .build();
 
         when(lenderRepository.findById(lenderId)).thenReturn(Optional.of(lender));
         when(transactionHistoryRepository.findByFilters(eq(lenderId), isNull(), isNull(), isNull(), isNull(), isNull()))
-                .thenReturn(List.of(h1));
+            .thenReturn(List.of(h1));
 
         HistoryQueryResponse response = transactionService.queryHistory(
-                lenderId, null, null, null, null, null);
+            lenderId, null, null, null, null, null);
 
         assertNotNull(response);
         assertEquals(1, response.history().size());
-        assertEquals("PAID_IN_FULL", response.history().get(0).type());
+        assertEquals("PAID_IN_FULL", response.history().getFirst().type());
     }
 }

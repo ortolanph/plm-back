@@ -1,5 +1,9 @@
 @baseUrl = http://localhost:9094
 @contentType = application/json
+@lenderId1 = d075681b-1f9e-4205-978f-5f5344d104a6
+@lenderId2 = 62f1df5c-6d6f-488b-91be-9ad013adac03
+@lenderId3 = f3b0dd8f-394b-40f2-b86e-1dbf4b09700b
+
 
 ### Actuator
 GET {{baseUrl}}/actuator
@@ -20,8 +24,6 @@ Content-Type: {{contentType}}
   "address": "123 Main Street"
 }
 
-> {% client.global.set("lenderId1", response.body.id); %}
-
 ### Create Lender #2 - Jane Smith (3 settlements)
 POST {{baseUrl}}/lenders
 Content-Type: {{contentType}}
@@ -33,8 +35,6 @@ Content-Type: {{contentType}}
   "address": "456 Oak Avenue"
 }
 
-> {% client.global.set("lenderId2", response.body.id); %}
-
 ### Create Lender #3 - Bob Wilson (5 settlements)
 POST {{baseUrl}}/lenders
 Content-Type: {{contentType}}
@@ -45,8 +45,6 @@ Content-Type: {{contentType}}
   "bankData": "IBAN:PT000000000000000003",
   "address": "789 Pine Road"
 }
-
-> {% client.global.set("lenderId3", response.body.id); %}
 
 ### ============================================
 ### CREATE SETTLEMENTS FOR LENDER 1 (John Doe)

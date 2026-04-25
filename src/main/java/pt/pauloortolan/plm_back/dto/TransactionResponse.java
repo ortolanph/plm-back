@@ -1,16 +1,16 @@
 package pt.pauloortolan.plm_back.dto;
 
-import pt.pauloortolan.plm_back.model.TransactionPaymentType;
-import pt.pauloortolan.plm_back.model.TransactionType;
+import pt.pauloortolan.plm_back.model.*;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.UUID;
+import java.math.*;
+import java.time.*;
+import java.util.*;
 
 public record TransactionResponse(
-        UUID id,
-        UUID lenderId,
-        LocalDateTime transactionDate,
-        BigDecimal transactionValue,
-        TransactionType transactionType,
-        TransactionPaymentType transactionPaymentType) {}
+    UUID id,
+    UUID lenderId,
+    LocalDateTime transactionDate,
+    BigDecimal transactionValue,
+    TransactionType transactionType,
+    TransactionPaymentType transactionPaymentType) {
+}

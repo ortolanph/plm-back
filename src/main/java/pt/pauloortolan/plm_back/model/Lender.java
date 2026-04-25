@@ -2,8 +2,9 @@ package pt.pauloortolan.plm_back.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
-import java.util.UUID;
+
+import java.time.*;
+import java.util.*;
 
 @Entity
 @Table(name = "lenders")

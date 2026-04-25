@@ -2,9 +2,10 @@ package pt.pauloortolan.plm_back.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.UUID;
+
+import java.math.*;
+import java.time.*;
+import java.util.*;
 
 @Entity
 @Table(name = "transactions")

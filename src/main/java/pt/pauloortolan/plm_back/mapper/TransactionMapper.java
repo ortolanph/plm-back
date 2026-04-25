@@ -1,9 +1,8 @@
 package pt.pauloortolan.plm_back.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import pt.pauloortolan.plm_back.dto.TransactionResponse;
-import pt.pauloortolan.plm_back.model.Transaction;
+import org.mapstruct.*;
+import pt.pauloortolan.plm_back.dto.*;
+import pt.pauloortolan.plm_back.model.*;
 
 @Mapper(componentModel = "spring")
 public interface TransactionMapper {

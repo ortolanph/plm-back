@@ -1,11 +1,12 @@
 package pt.pauloortolan.plm_back.dto;
 
-import pt.pauloortolan.plm_back.model.TransactionType;
+import pt.pauloortolan.plm_back.model.*;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.math.*;
+import java.time.*;
 
 public record TransactionItem(
-        LocalDateTime date,
-        BigDecimal value,
-        TransactionType type) {}
+    LocalDateTime date,
+    BigDecimal value,
+    TransactionType type) {
+}

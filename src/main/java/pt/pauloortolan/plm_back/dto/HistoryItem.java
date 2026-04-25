@@ -1,9 +1,9 @@
 package pt.pauloortolan.plm_back.dto;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.math.*;
 
 public record HistoryItem(
-        String date,
-        BigDecimal value,
-        String type) {}
+    String date,
+    BigDecimal value,
+    String type) {
+}

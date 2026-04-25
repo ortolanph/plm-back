@@ -1,30 +1,34 @@
 package pt.pauloortolan.plm_back.service;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.*;
+import org.mockito.*;
+import org.mockito.junit.jupiter.*;
 import pt.pauloortolan.plm_back.dto.*;
-import pt.pauloortolan.plm_back.model.GeneratedCode;
-import pt.pauloortolan.plm_back.repository.GeneratedCodeRepository;
+import pt.pauloortolan.plm_back.model.*;
+import pt.pauloortolan.plm_back.repository.*;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
+import java.time.*;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CodeServiceTest {
 
+    private static final String TEST_EMAIL = "test@example.com";
     @Mock
     private GeneratedCodeRepository repository;
-
     private CodeService codeService;
-    private static final String TEST_EMAIL = "test@example.com";
 
     @BeforeEach
     void setUp() {
@@ -49,9 +53,9 @@ class CodeServiceTest {
     @Test
     void generateCode_duplicateCode_retriesAndSucceeds() {
         when(repository.findByCodeAndEmail(anyString(), anyString()))
-                .thenReturn(Optional.of(new GeneratedCode("123456", TEST_EMAIL)))
-                .thenReturn(Optional.empty())
-                .thenReturn(Optional.empty());
+            .thenReturn(Optional.of(new GeneratedCode("123456", TEST_EMAIL)))
+            .thenReturn(Optional.empty())
+            .thenReturn(Optional.empty());
         when(repository.save(any(GeneratedCode.class))).thenAnswer(inv -> inv.getArgument(0));
 
         GenerateResponse response = codeService.generateCode(TEST_EMAIL);
