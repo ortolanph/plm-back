@@ -10,7 +10,10 @@ The system must be able to query the summary of a lender with the transactions a
 
 - GIVEN the user wants to query the history
 - WHEN there's a call to query history data on endpoint `/lenders/{lenderId}/summary`
-- THEN the system generates the report
+- THEN the system retrieves basic lender data
+- AND the list of current transactions
+- AND the list of related history data
+- AND generates the following report
 
 Format
 ```
@@ -63,5 +66,6 @@ Format
 ## Acceptance Criteria
 
 1. Tests are implemented
-2. API documentation (api/plm.yaml) is updated
+2. API documentation (`api/plm.yaml`) is updated
 3. Migrations are created if applicable
+4. Add integration testss at the `integration-tests` folder
