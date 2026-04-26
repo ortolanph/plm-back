@@ -1,8 +1,8 @@
 @baseUrl = http://localhost:9094
 @contentType = application/json
-@lenderId1 = d075681b-1f9e-4205-978f-5f5344d104a6
-@lenderId2 = 62f1df5c-6d6f-488b-91be-9ad013adac03
-@lenderId3 = f3b0dd8f-394b-40f2-b86e-1dbf4b09700b
+@lenderId1 = abcddac5-e8d7-490e-9532-48dc6d53b81f
+@lenderId2 = e8a11ae9-2826-4460-bd3e-d8de4a4f5432
+@lenderId3 = d99f0973-92a7-495f-811a-7154983e8e4c
 
 
 ### Actuator
