@@ -18,6 +18,8 @@ tags:
     description: Transaction management operations
   - name: Debts
     description: Debt reporting operations
+  - name: Reports
+    description: Report generation operations
 
 paths:
   /codes/generate:
@@ -399,6 +401,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtsResponse'
+
+  /reports/excel:
+    get:
+      summary: Generate Excel or ODS report for all lenders
+      tags: [Reports]
+      operationId: getExcelReport
+      parameters:
+        - name: openDoc
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: If true, generates ODS format; otherwise XLSX
+      responses:
+        '200':
+          description: Report generated successfully
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+            application/vnd.oasis.opendocument.spreadsheet:
+              schema:
+                type: string
+                format: binary
 
 components:
   schemas:

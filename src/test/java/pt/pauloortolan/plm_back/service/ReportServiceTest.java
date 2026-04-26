@@ -341,4 +341,53 @@ class ReportServiceTest {
         assertTrue(lines[1].contains("BORROWED"));
         assertTrue(lines[1].contains("PAID_IN_FULL"));
     }
+
+    @Test
+    void generateExcelReport_shouldReturnValidExcelFile() {
+        when(lenderRepository.findAll()).thenReturn(List.of(lender));
+        when(transactionRepository.findByLenderId(lenderId)).thenReturn(List.of(transaction1));
+        when(transactionHistoryRepository.findByLenderId(lenderId)).thenReturn(List.of(history1));
+
+        byte[] excelContent = reportService.generateExcelReport();
+
+        assertNotNull(excelContent);
+        assertTrue(excelContent.length > 0);
+        assertTrue(excelContent[0] == 0x50);
+        assertTrue(excelContent[1] == 0x4B);
+    }
+
+    @Test
+    void generateExcelReport_shouldThrowExceptionWhenNoLenders() {
+        when(lenderRepository.findAll()).thenReturn(List.of());
+
+        assertThrows(IllegalStateException.class, () -> reportService.generateExcelReport());
+    }
+
+    @Test
+    void generateOdsReport_shouldReturnValidExcelSpreadsheet() {
+        when(lenderRepository.findAll()).thenReturn(List.of(lender));
+        when(transactionRepository.findByLenderId(lenderId)).thenReturn(List.of(transaction1));
+        when(transactionHistoryRepository.findByLenderId(lenderId)).thenReturn(List.of(history1));
+
+        byte[] odsContent = reportService.generateOdsReport();
+
+        assertNotNull(odsContent);
+        assertTrue(odsContent.length > 0);
+    }
+
+    @Test
+    void getExcelFileName_shouldReturnCorrectFormat() {
+        String fileName = reportService.getExcelFileName();
+
+        assertTrue(fileName.startsWith("personal_load_manager_"));
+        assertTrue(fileName.endsWith(".xlsx"));
+    }
+
+    @Test
+    void getOdsFileName_shouldReturnCorrectFormat() {
+        String fileName = reportService.getOdsFileName();
+
+        assertTrue(fileName.startsWith("personal_load_manager_"));
+        assertTrue(fileName.endsWith(".ods"));
+    }
 }

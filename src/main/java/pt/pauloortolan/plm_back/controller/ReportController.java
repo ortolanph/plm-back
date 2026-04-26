@@ -51,4 +51,28 @@ public class ReportController {
             .contentType(MediaType.parseMediaType("application/zip"))
             .body(zipContent);
     }
+
+    @GetMapping("/excel")
+    public ResponseEntity<byte[]> getExcelReport(@RequestParam(required = false, defaultValue = "false") Boolean openDoc) {
+        log.info("ReportController::getExcelReport(openDoc={})", openDoc);
+        
+        byte[] excelContent;
+        String fileName;
+        
+        if (Boolean.TRUE.equals(openDoc)) {
+            excelContent = reportService.generateOdsReport();
+            fileName = reportService.getOdsFileName();
+            return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                .contentType(MediaType.parseMediaType("application/vnd.oasis.opendocument.spreadsheet"))
+                .body(excelContent);
+        } else {
+            excelContent = reportService.generateExcelReport();
+            fileName = reportService.getExcelFileName();
+            return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(excelContent);
+        }
+    }
 }
