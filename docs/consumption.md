@@ -63,5 +63,16 @@
 
 ### PLM-0008 - Excel report
 
-### PLM-0008 - Excel report
+* 65,274 tokens
+* 33% used
+* $0.00 spent
+* Notes: had to ask it to add the csv endpoints
+
+### PLM-0009 - PDF, DOCX and ODT report report
+
+
+
+### PLM-0010 - History deletion
+
+
 
