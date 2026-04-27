@@ -428,6 +428,72 @@ paths:
                 type: string
                 format: binary
 
+  /reports/csv/transactions/{lenderId}:
+    get:
+      summary: Generate transaction CSV report for a lender
+      tags: [Reports]
+      operationId: getTransactionCsv
+      parameters:
+        - name: lenderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Lender ID
+      responses:
+        '200':
+          description: CSV report generated successfully
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+
+  /reports/csv/history/{lenderId}:
+    get:
+      summary: Generate history CSV report for a lender
+      tags: [Reports]
+      operationId: getHistoryCsv
+      parameters:
+        - name: lenderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Lender ID
+      responses:
+        '200':
+          description: CSV report generated successfully
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+
+  /reports/csv/all/{lenderId}:
+    get:
+      summary: Generate ZIP report containing transaction and history CSV for a lender
+      tags: [Reports]
+      operationId: getAllReports
+      parameters:
+        - name: lenderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Lender ID
+      responses:
+        '200':
+          description: ZIP report generated successfully
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+
 components:
   schemas:
     GenerateResponse:
