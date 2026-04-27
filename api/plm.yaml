@@ -18,6 +18,8 @@ tags:
     description: Transaction management operations
   - name: Debts
     description: Debt reporting operations
+  - name: Reports
+    description: Report generation operations
 
 paths:
   /codes/generate:
@@ -399,6 +401,98 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtsResponse'
+
+  /reports/excel:
+    get:
+      summary: Generate Excel or ODS report for all lenders
+      tags: [Reports]
+      operationId: getExcelReport
+      parameters:
+        - name: openDoc
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: If true, generates ODS format; otherwise XLSX
+      responses:
+        '200':
+          description: Report generated successfully
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+            application/vnd.oasis.opendocument.spreadsheet:
+              schema:
+                type: string
+                format: binary
+
+  /reports/csv/transactions/{lenderId}:
+    get:
+      summary: Generate transaction CSV report for a lender
+      tags: [Reports]
+      operationId: getTransactionCsv
+      parameters:
+        - name: lenderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Lender ID
+      responses:
+        '200':
+          description: CSV report generated successfully
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+
+  /reports/csv/history/{lenderId}:
+    get:
+      summary: Generate history CSV report for a lender
+      tags: [Reports]
+      operationId: getHistoryCsv
+      parameters:
+        - name: lenderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Lender ID
+      responses:
+        '200':
+          description: CSV report generated successfully
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+
+  /reports/csv/all/{lenderId}:
+    get:
+      summary: Generate ZIP report containing transaction and history CSV for a lender
+      tags: [Reports]
+      operationId: getAllReports
+      parameters:
+        - name: lenderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Lender ID
+      responses:
+        '200':
+          description: ZIP report generated successfully
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
 
 components:
   schemas:

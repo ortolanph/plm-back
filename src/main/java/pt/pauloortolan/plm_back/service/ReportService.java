@@ -3,6 +3,9 @@ package pt.pauloortolan.plm_back.service;
 import com.opencsv.CSVWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.WorkbookUtil;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.pauloortolan.plm_back.model.*;
@@ -162,5 +165,134 @@ public class ReportService {
             case PAYMENT -> "PAYED";
             case CANCELLED -> "CANCELLED";
         };
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] generateExcelReport() {
+        log.info("ReportService::generateExcelReport()");
+
+        List<Lender> lenders = new ArrayList<>(lenderRepository.findAll());
+        if (lenders.isEmpty()) {
+            throw new IllegalStateException("No lenders found");
+        }
+
+        try (Workbook workbook = new XSSFWorkbook()) {
+            CellStyle headerStyle = workbook.createCellStyle();
+            headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+            headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            org.apache.poi.ss.usermodel.Font headerFont = workbook.createFont();
+            headerFont.setBold(true);
+            headerStyle.setFont(headerFont);
+
+            CellStyle titleStyle = workbook.createCellStyle();
+            titleStyle.setFillForegroundColor(IndexedColors.DARK_BLUE.getIndex());
+            titleStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            org.apache.poi.ss.usermodel.Font titleFont = workbook.createFont();
+            titleFont.setBold(true);
+            titleFont.setColor(IndexedColors.WHITE.getIndex());
+            titleStyle.setFont(titleFont);
+
+            for (Lender lender : lenders) {
+                String safeSheetName = WorkbookUtil.createSafeSheetName(lender.getName());
+                Sheet sheet = workbook.createSheet(safeSheetName);
+
+                int rowNum = 0;
+
+                Row titleRow = sheet.createRow(rowNum++);
+                Cell titleCell = titleRow.createCell(0);
+                titleCell.setCellValue("Personal Load Manager");
+                titleCell.setCellStyle(titleStyle);
+                sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(0, 0, 0, 3));
+
+                rowNum++;
+
+                Row basicDataHeader = sheet.createRow(rowNum++);
+                Cell basicDataCell = basicDataHeader.createCell(0);
+                basicDataCell.setCellValue("Basic Data");
+                basicDataCell.setCellStyle(headerStyle);
+
+                Row basicDataRow = sheet.createRow(rowNum++);
+                basicDataRow.createCell(0).setCellValue("Lender");
+                basicDataRow.createCell(1).setCellValue(lender.getName() != null ? lender.getName() : "");
+                basicDataRow.createCell(2).setCellValue("Phone");
+                basicDataRow.createCell(3).setCellValue(lender.getPhone() != null ? lender.getPhone() : "");
+
+                Row bankDataRow = sheet.createRow(rowNum++);
+                bankDataRow.createCell(0).setCellValue("Bank Data");
+                bankDataRow.createCell(1).setCellValue(lender.getBankData() != null ? lender.getBankData() : "");
+                bankDataRow.createCell(2).setCellValue("Address");
+                bankDataRow.createCell(3).setCellValue(lender.getAddress() != null ? lender.getAddress() : "");
+
+                rowNum++;
+
+                List<Transaction> transactions = new ArrayList<>(transactionRepository.findByLenderId(lender.getId()));
+                transactions.sort(Comparator.comparing(Transaction::getTransactionDate));
+
+                Row transactionHeader = sheet.createRow(rowNum++);
+                String[] txHeaders = {"Transaction", "Date", "Value", "Type", "Payment Type"};
+                for (int i = 0; i < txHeaders.length; i++) {
+                    Cell cell = transactionHeader.createCell(i);
+                    cell.setCellValue(txHeaders[i]);
+                    cell.setCellStyle(headerStyle);
+                }
+
+                for (Transaction tx : transactions) {
+                    Row txRow = sheet.createRow(rowNum++);
+                    txRow.createCell(0).setCellValue("Transaction");
+                    txRow.createCell(1).setCellValue(tx.getTransactionDate() != null ? tx.getTransactionDate().format(DATE_FORMATTER) : "");
+                    txRow.createCell(2).setCellValue(tx.getTransactionValue() != null ? BRAZILIAN_NUMBER_FORMAT.format(tx.getTransactionValue()) : "");
+                    txRow.createCell(3).setCellValue(mapTransactionTypeToCsv(tx.getTransactionType()));
+                    txRow.createCell(4).setCellValue(tx.getTransactionPaymentType() != null ? tx.getTransactionPaymentType().name() : "");
+                }
+
+                rowNum++;
+
+                List<TransactionHistory> historyList = new ArrayList<>(transactionHistoryRepository.findByLenderId(lender.getId()));
+                historyList.sort(Comparator.comparing(TransactionHistory::getHistoryDate));
+
+                Row historyHeader = sheet.createRow(rowNum++);
+                String[] histHeaders = {"History", "Date", "Value", "Type", "Reason"};
+                for (int i = 0; i < histHeaders.length; i++) {
+                    Cell cell = historyHeader.createCell(i);
+                    cell.setCellValue(histHeaders[i]);
+                    cell.setCellStyle(headerStyle);
+                }
+
+                for (TransactionHistory h : historyList) {
+                    Row histRow = sheet.createRow(rowNum++);
+                    histRow.createCell(0).setCellValue("History");
+                    histRow.createCell(1).setCellValue(h.getHistoryDate() != null ? h.getHistoryDate().format(DATE_FORMATTER) : "");
+                    histRow.createCell(2).setCellValue(h.getTransactionValue() != null ? BRAZILIAN_NUMBER_FORMAT.format(h.getTransactionValue()) : "");
+                    histRow.createCell(3).setCellValue(mapTransactionTypeToCsv(h.getTransactionType()));
+                    histRow.createCell(4).setCellValue(h.getHistoryType() != null ? h.getHistoryType().name() : "");
+                }
+
+                for (int i = 0; i < 5; i++) {
+                    sheet.autoSizeColumn(i);
+                }
+            }
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            workbook.write(baos);
+            return baos.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to generate Excel report", e);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] generateOdsReport() {
+        log.info("ReportService::generateOdsReport()");
+        return generateExcelReport();
+    }
+
+    public String getExcelFileName() {
+        String timestamp = LocalDateTime.now().format(FILE_NAME_FORMATTER);
+        return "personal_load_manager_" + timestamp + ".xlsx";
+    }
+
+    public String getOdsFileName() {
+        String timestamp = LocalDateTime.now().format(FILE_NAME_FORMATTER);
+        return "personal_load_manager_" + timestamp + ".ods";
     }
 }
