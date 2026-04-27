@@ -52,6 +52,36 @@ public class ReportController {
             .body(zipContent);
     }
 
+    @GetMapping("/pdf")
+    public ResponseEntity<byte[]> getPdfReport(
+            @RequestParam(required = false, defaultValue = "false") Boolean word,
+            @RequestParam(required = false, defaultValue = "false") Boolean opendoc) {
+        log.info("ReportController::getPdfReport(word={}, opendoc={})", word, opendoc);
+        
+        byte[] content;
+        String fileName;
+        String contentType;
+        
+        if (Boolean.TRUE.equals(word)) {
+            content = reportService.generateDocxReport();
+            fileName = reportService.getDocxFileName();
+            contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+        } else if (Boolean.TRUE.equals(opendoc)) {
+            content = reportService.generateOdtReport();
+            fileName = reportService.getOdtFileName();
+            contentType = "application/vnd.oasis.opendocument.text";
+        } else {
+            content = reportService.generatePdfReport();
+            fileName = reportService.getPdfFileName();
+            contentType = "application/pdf";
+        }
+        
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+            .contentType(MediaType.parseMediaType(contentType))
+            .body(content);
+    }
+
     @GetMapping("/excel")
     public ResponseEntity<byte[]> getExcelReport(@RequestParam(required = false, defaultValue = "false") Boolean openDoc) {
         log.info("ReportController::getExcelReport(openDoc={})", openDoc);

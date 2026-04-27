@@ -26,6 +26,8 @@ dependencies {
 	implementation("org.flywaydb:flyway-database-postgresql")
 	implementation("com.opencsv:opencsv:5.9")
 	implementation("org.apache.poi:poi-ooxml:5.2.5")
+	implementation("com.itextpdf:itext7-core:7.2.5")
+	implementation("com.itextpdf:html2pdf:4.0.5")
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	developmentOnly("org.springframework.boot:spring-boot-docker-compose")

@@ -390,4 +390,66 @@ class ReportServiceTest {
         assertTrue(fileName.startsWith("personal_load_manager_"));
         assertTrue(fileName.endsWith(".ods"));
     }
+
+    @Test
+    void getPdfFileName_shouldReturnCorrectFormat() {
+        String fileName = reportService.getPdfFileName();
+
+        assertTrue(fileName.startsWith("personal_load_manager_"));
+        assertTrue(fileName.endsWith(".pdf"));
+    }
+
+    @Test
+    void getDocxFileName_shouldReturnCorrectFormat() {
+        String fileName = reportService.getDocxFileName();
+
+        assertTrue(fileName.startsWith("personal_load_manager_"));
+        assertTrue(fileName.endsWith(".docx"));
+    }
+
+    @Test
+    void getOdtFileName_shouldReturnCorrectFormat() {
+        String fileName = reportService.getOdtFileName();
+
+        assertTrue(fileName.startsWith("personal_load_manager_"));
+        assertTrue(fileName.endsWith(".odt"));
+    }
+
+    @Test
+    void generatePdfReport_shouldReturnValidPdf() {
+        when(lenderRepository.findAll()).thenReturn(List.of(lender));
+        when(transactionRepository.findByLenderId(lenderId)).thenReturn(List.of(transaction1));
+        when(transactionHistoryRepository.findByLenderId(lenderId)).thenReturn(List.of(history1));
+
+        byte[] pdfContent = reportService.generatePdfReport();
+
+        assertNotNull(pdfContent);
+        assertTrue(pdfContent.length > 0);
+        assertTrue(pdfContent[0] == 0x25);
+        assertTrue(pdfContent[1] == 0x50);
+    }
+
+    @Test
+    void generateDocxReport_shouldReturnValidDocx() {
+        when(lenderRepository.findAll()).thenReturn(List.of(lender));
+        when(transactionRepository.findByLenderId(lenderId)).thenReturn(List.of(transaction1));
+        when(transactionHistoryRepository.findByLenderId(lenderId)).thenReturn(List.of(history1));
+
+        byte[] docxContent = reportService.generateDocxReport();
+
+        assertNotNull(docxContent);
+        assertTrue(docxContent.length > 0);
+    }
+
+    @Test
+    void generateOdtReport_shouldReturnValidOdt() {
+        when(lenderRepository.findAll()).thenReturn(List.of(lender));
+        when(transactionRepository.findByLenderId(lenderId)).thenReturn(List.of(transaction1));
+        when(transactionHistoryRepository.findByLenderId(lenderId)).thenReturn(List.of(history1));
+
+        byte[] odtContent = reportService.generateOdtReport();
+
+        assertNotNull(odtContent);
+        assertTrue(odtContent.length > 0);
+    }
 }

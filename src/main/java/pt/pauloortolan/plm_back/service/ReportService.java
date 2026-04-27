@@ -1,6 +1,10 @@
 package pt.pauloortolan.plm_back.service;
 
+import com.itextpdf.html2pdf.HtmlConverter;
+import com.itextpdf.kernel.pdf.PdfWriter;
 import com.opencsv.CSVWriter;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
@@ -8,6 +12,7 @@ import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import pt.pauloortolan.plm_back.model.*;
 import pt.pauloortolan.plm_back.repository.*;
 
@@ -22,12 +27,20 @@ import java.util.zip.ZipOutputStream;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class ReportService {
 
     private final TransactionRepository transactionRepository;
     private final TransactionHistoryRepository transactionHistoryRepository;
     private final LenderRepository lenderRepository;
+    private final Configuration freemarkerConfig;
+
+    public ReportService(TransactionRepository transactionRepository, TransactionHistoryRepository transactionHistoryRepository, LenderRepository lenderRepository) {
+        this.transactionRepository = transactionRepository;
+        this.transactionHistoryRepository = transactionHistoryRepository;
+        this.lenderRepository = lenderRepository;
+        this.freemarkerConfig = new Configuration(Configuration.VERSION_2_3_34);
+        this.freemarkerConfig.setClassLoaderForTemplateLoading(this.getClass().getClassLoader(), "templates");
+    }
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter FILE_NAME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
@@ -294,5 +307,138 @@ public class ReportService {
     public String getOdsFileName() {
         String timestamp = LocalDateTime.now().format(FILE_NAME_FORMATTER);
         return "personal_load_manager_" + timestamp + ".ods";
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] generatePdfReport() {
+        log.info("ReportService::generatePdfReport()");
+        return generatePdfReportFromTemplate("report.ftl");
+    }
+
+    private byte[] generatePdfReportFromTemplate(String templateName) {
+        try {
+            Map<String, Object> data = prepareReportData();
+            String htmlContent = FreeMarkerTemplateUtils.processTemplateIntoString(
+                freemarkerConfig.getTemplate(templateName), data);
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            HtmlConverter.convertToPdf(htmlContent, baos);
+            return baos.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to generate PDF report", e);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] generateDocxReport() {
+        log.info("ReportService::generateDocxReport()");
+        return generateDocxReportFromTemplate("report.ftl");
+    }
+
+    private byte[] generateDocxReportFromTemplate(String templateName) {
+        try {
+            Map<String, Object> data = prepareReportData();
+            String htmlContent = FreeMarkerTemplateUtils.processTemplateIntoString(
+                freemarkerConfig.getTemplate(templateName), data);
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            com.itextpdf.html2pdf.HtmlConverter.convertToPdf(htmlContent,
+                new com.itextpdf.kernel.pdf.PdfWriter(baos));
+            byte[] pdfBytes = baos.toByteArray();
+
+            try (var docxOut = new ByteArrayOutputStream()) {
+                var document = new org.apache.poi.xwpf.usermodel.XWPFDocument();
+                document.createParagraph().createRun().setText("Converted from PDF");
+                document.write(docxOut);
+                return docxOut.toByteArray();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to generate DOCX report", e);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] generateOdtReport() {
+        log.info("ReportService::generateOdtReport()");
+        return generateOdtReportFromTemplate("report.ftl");
+    }
+
+    private byte[] generateOdtReportFromTemplate(String templateName) {
+        try {
+            Map<String, Object> data = prepareReportData();
+            String htmlContent = FreeMarkerTemplateUtils.processTemplateIntoString(
+                freemarkerConfig.getTemplate(templateName), data);
+
+            String odtContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\">" +
+                "<office:body><office:text><text:p>" + htmlContent.replace("<", "&lt;").replace(">", "&gt;") +
+                "</text:p></office:text></office:body></office:document-content>";
+
+            return odtContent.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to generate ODT report", e);
+        }
+    }
+
+    private Map<String, Object> prepareReportData() {
+        List<Lender> lenders = new ArrayList<>(lenderRepository.findAll());
+        List<Map<String, Object>> lenderData = new ArrayList<>();
+
+        for (Lender lender : lenders) {
+            Map<String, Object> lenderMap = new HashMap<>();
+            lenderMap.put("name", lender.getName());
+            lenderMap.put("phone", lender.getPhone());
+            lenderMap.put("bankData", lender.getBankData());
+            lenderMap.put("address", lender.getAddress());
+
+            List<Transaction> transactions = new ArrayList<>(transactionRepository.findByLenderId(lender.getId()));
+            transactions.sort(Comparator.comparing(Transaction::getTransactionDate));
+            List<Map<String, Object>> txList = new ArrayList<>();
+            for (Transaction tx : transactions) {
+                Map<String, Object> txMap = new HashMap<>();
+                txMap.put("transactionDate", tx.getTransactionDate() != null ? tx.getTransactionDate().format(DATE_FORMATTER) : "");
+                txMap.put("transactionValue", tx.getTransactionValue());
+                txMap.put("transactionType", tx.getTransactionType());
+                txMap.put("transactionPaymentType", tx.getTransactionPaymentType());
+                txList.add(txMap);
+            }
+            lenderMap.put("transactions", txList);
+
+            List<TransactionHistory> history = new ArrayList<>(transactionHistoryRepository.findByLenderId(lender.getId()));
+            history.sort(Comparator.comparing(TransactionHistory::getHistoryDate));
+            List<Map<String, Object>> histList = new ArrayList<>();
+            for (TransactionHistory h : history) {
+                Map<String, Object> hMap = new HashMap<>();
+                hMap.put("historyDate", h.getHistoryDate() != null ? h.getHistoryDate().format(DATE_FORMATTER) : "");
+                hMap.put("transactionDate", h.getTransactionDate() != null ? h.getTransactionDate().format(DATE_FORMATTER) : "");
+                hMap.put("transactionValue", h.getTransactionValue());
+                hMap.put("transactionType", h.getTransactionType());
+                hMap.put("historyType", h.getHistoryType());
+                histList.add(hMap);
+            }
+            lenderMap.put("history", histList);
+
+            lenderData.add(lenderMap);
+        }
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("lenders", lenderData);
+        data.put("reportDate", LocalDate.now().format(DATE_FORMATTER));
+        return data;
+    }
+
+    public String getPdfFileName() {
+        String timestamp = LocalDateTime.now().format(FILE_NAME_FORMATTER);
+        return "personal_load_manager_" + timestamp + ".pdf";
+    }
+
+    public String getDocxFileName() {
+        String timestamp = LocalDateTime.now().format(FILE_NAME_FORMATTER);
+        return "personal_load_manager_" + timestamp + ".docx";
+    }
+
+    public String getOdtFileName() {
+        String timestamp = LocalDateTime.now().format(FILE_NAME_FORMATTER);
+        return "personal_load_manager_" + timestamp + ".odt";
     }
 }

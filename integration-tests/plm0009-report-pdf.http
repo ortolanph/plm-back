@@ -1,0 +1,11 @@
+### Generate PDF Report
+GET http://localhost:9094/reports/pdf
+Accept: application/pdf
+
+### Generate DOCX Report
+GET http://localhost:9094/reports/pdf?word=true
+Accept: application/vnd.openxmlformats-officedocument.wordprocessingml.document
+
+### Generate ODT Report
+GET http://localhost:9094/reports/pdf?opendoc=true
+Accept: application/vnd.oasis.opendocument.text
