@@ -404,37 +404,14 @@ paths:
 
   /reports/pdf:
     get:
-      summary: Generate PDF, DOCX, or ODT report for all lenders
+      summary: Generate PDF report for all lenders
       tags: [Reports]
       operationId: getPdfReport
-      parameters:
-        - name: word
-          in: query
-          required: false
-          schema:
-            type: boolean
-            default: false
-          description: If true, generates DOCX format
-        - name: opendoc
-          in: query
-          required: false
-          schema:
-            type: boolean
-            default: false
-          description: If true, generates ODT format; otherwise PDF
       responses:
         '200':
           description: Report generated successfully
           content:
             application/pdf:
-              schema:
-                type: string
-                format: binary
-            application/vnd.openxmlformats-officedocument.wordprocessingml.document:
-              schema:
-                type: string
-                format: binary
-            application/vnd.oasis.opendocument.text:
               schema:
                 type: string
                 format: binary

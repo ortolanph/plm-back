@@ -9,5 +9,5 @@
 7. [x] [plm0006-debts](../specs/plm0006-debts)
 8. [x] [plm0007-report-csv](../specs/plm0007-report-csv)
 9. [x] [plm0008-report-excel](../specs/plm0008-report-excel)
-10. [ ] [plm0009-report-pdf](../specs/plm0009-report-pdf)
+10. [x] [plm0009-report-pdf](../specs/plm0009-report-pdf)
 11. [ ] [plm0010-history-deletion](../specs/plm0010-history-deletion)

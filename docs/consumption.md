@@ -70,9 +70,10 @@
 
 ### PLM-0009 - PDF, DOCX and ODT report report
 
-
+* 95,382 tokens
+* 48% used
+* $0.00 spent
+* Notes: asked to generate the PDF file. The DOCX and the ODT files where bad.
 
 ### PLM-0010 - History deletion
-
-
 

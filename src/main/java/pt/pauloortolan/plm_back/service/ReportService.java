@@ -1,10 +1,8 @@
 package pt.pauloortolan.plm_back.service;
 
 import com.itextpdf.html2pdf.HtmlConverter;
-import com.itextpdf.kernel.pdf.PdfWriter;
 import com.opencsv.CSVWriter;
 import freemarker.template.Configuration;
-import freemarker.template.Template;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
@@ -329,57 +327,6 @@ public class ReportService {
         }
     }
 
-    @Transactional(readOnly = true)
-    public byte[] generateDocxReport() {
-        log.info("ReportService::generateDocxReport()");
-        return generateDocxReportFromTemplate("report.ftl");
-    }
-
-    private byte[] generateDocxReportFromTemplate(String templateName) {
-        try {
-            Map<String, Object> data = prepareReportData();
-            String htmlContent = FreeMarkerTemplateUtils.processTemplateIntoString(
-                freemarkerConfig.getTemplate(templateName), data);
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            com.itextpdf.html2pdf.HtmlConverter.convertToPdf(htmlContent,
-                new com.itextpdf.kernel.pdf.PdfWriter(baos));
-            byte[] pdfBytes = baos.toByteArray();
-
-            try (var docxOut = new ByteArrayOutputStream()) {
-                var document = new org.apache.poi.xwpf.usermodel.XWPFDocument();
-                document.createParagraph().createRun().setText("Converted from PDF");
-                document.write(docxOut);
-                return docxOut.toByteArray();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to generate DOCX report", e);
-        }
-    }
-
-    @Transactional(readOnly = true)
-    public byte[] generateOdtReport() {
-        log.info("ReportService::generateOdtReport()");
-        return generateOdtReportFromTemplate("report.ftl");
-    }
-
-    private byte[] generateOdtReportFromTemplate(String templateName) {
-        try {
-            Map<String, Object> data = prepareReportData();
-            String htmlContent = FreeMarkerTemplateUtils.processTemplateIntoString(
-                freemarkerConfig.getTemplate(templateName), data);
-
-            String odtContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-                "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\">" +
-                "<office:body><office:text><text:p>" + htmlContent.replace("<", "&lt;").replace(">", "&gt;") +
-                "</text:p></office:text></office:body></office:document-content>";
-
-            return odtContent.getBytes(java.nio.charset.StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to generate ODT report", e);
-        }
-    }
-
     private Map<String, Object> prepareReportData() {
         List<Lender> lenders = new ArrayList<>(lenderRepository.findAll());
         List<Map<String, Object>> lenderData = new ArrayList<>();
@@ -430,15 +377,5 @@ public class ReportService {
     public String getPdfFileName() {
         String timestamp = LocalDateTime.now().format(FILE_NAME_FORMATTER);
         return "personal_load_manager_" + timestamp + ".pdf";
-    }
-
-    public String getDocxFileName() {
-        String timestamp = LocalDateTime.now().format(FILE_NAME_FORMATTER);
-        return "personal_load_manager_" + timestamp + ".docx";
-    }
-
-    public String getOdtFileName() {
-        String timestamp = LocalDateTime.now().format(FILE_NAME_FORMATTER);
-        return "personal_load_manager_" + timestamp + ".odt";
     }
 }
