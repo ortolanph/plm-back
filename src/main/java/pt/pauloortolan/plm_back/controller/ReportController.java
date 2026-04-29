@@ -52,6 +52,19 @@ public class ReportController {
             .body(zipContent);
     }
 
+    @GetMapping("/pdf")
+    public ResponseEntity<byte[]> getPdfReport() {
+        log.info("ReportController::getPdfReport()");
+        
+        byte[] content = reportService.generatePdfReport();
+        String fileName = reportService.getPdfFileName();
+        
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+            .contentType(MediaType.parseMediaType("application/pdf"))
+            .body(content);
+    }
+
     @GetMapping("/excel")
     public ResponseEntity<byte[]> getExcelReport(@RequestParam(required = false, defaultValue = "false") Boolean openDoc) {
         log.info("ReportController::getExcelReport(openDoc={})", openDoc);

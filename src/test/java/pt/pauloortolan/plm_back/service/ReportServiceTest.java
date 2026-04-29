@@ -390,4 +390,26 @@ class ReportServiceTest {
         assertTrue(fileName.startsWith("personal_load_manager_"));
         assertTrue(fileName.endsWith(".ods"));
     }
+
+    @Test
+    void getPdfFileName_shouldReturnCorrectFormat() {
+        String fileName = reportService.getPdfFileName();
+
+        assertTrue(fileName.startsWith("personal_load_manager_"));
+        assertTrue(fileName.endsWith(".pdf"));
+    }
+
+    @Test
+    void generatePdfReport_shouldReturnValidPdf() {
+        when(lenderRepository.findAll()).thenReturn(List.of(lender));
+        when(transactionRepository.findByLenderId(lenderId)).thenReturn(List.of(transaction1));
+        when(transactionHistoryRepository.findByLenderId(lenderId)).thenReturn(List.of(history1));
+
+        byte[] pdfContent = reportService.generatePdfReport();
+
+        assertNotNull(pdfContent);
+        assertTrue(pdfContent.length > 0);
+        assertTrue(pdfContent[0] == 0x25);
+        assertTrue(pdfContent[1] == 0x50);
+    }
 }

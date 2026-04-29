@@ -1,6 +1,8 @@
 package pt.pauloortolan.plm_back.service;
 
+import com.itextpdf.html2pdf.HtmlConverter;
 import com.opencsv.CSVWriter;
+import freemarker.template.Configuration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
@@ -8,6 +10,7 @@ import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import pt.pauloortolan.plm_back.model.*;
 import pt.pauloortolan.plm_back.repository.*;
 
@@ -22,12 +25,20 @@ import java.util.zip.ZipOutputStream;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class ReportService {
 
     private final TransactionRepository transactionRepository;
     private final TransactionHistoryRepository transactionHistoryRepository;
     private final LenderRepository lenderRepository;
+    private final Configuration freemarkerConfig;
+
+    public ReportService(TransactionRepository transactionRepository, TransactionHistoryRepository transactionHistoryRepository, LenderRepository lenderRepository) {
+        this.transactionRepository = transactionRepository;
+        this.transactionHistoryRepository = transactionHistoryRepository;
+        this.lenderRepository = lenderRepository;
+        this.freemarkerConfig = new Configuration(Configuration.VERSION_2_3_34);
+        this.freemarkerConfig.setClassLoaderForTemplateLoading(this.getClass().getClassLoader(), "templates");
+    }
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter FILE_NAME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
@@ -294,5 +305,77 @@ public class ReportService {
     public String getOdsFileName() {
         String timestamp = LocalDateTime.now().format(FILE_NAME_FORMATTER);
         return "personal_load_manager_" + timestamp + ".ods";
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] generatePdfReport() {
+        log.info("ReportService::generatePdfReport()");
+        return generatePdfReportFromTemplate("report.ftl");
+    }
+
+    private byte[] generatePdfReportFromTemplate(String templateName) {
+        try {
+            Map<String, Object> data = prepareReportData();
+            String htmlContent = FreeMarkerTemplateUtils.processTemplateIntoString(
+                freemarkerConfig.getTemplate(templateName), data);
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            HtmlConverter.convertToPdf(htmlContent, baos);
+            return baos.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to generate PDF report", e);
+        }
+    }
+
+    private Map<String, Object> prepareReportData() {
+        List<Lender> lenders = new ArrayList<>(lenderRepository.findAll());
+        List<Map<String, Object>> lenderData = new ArrayList<>();
+
+        for (Lender lender : lenders) {
+            Map<String, Object> lenderMap = new HashMap<>();
+            lenderMap.put("name", lender.getName());
+            lenderMap.put("phone", lender.getPhone());
+            lenderMap.put("bankData", lender.getBankData());
+            lenderMap.put("address", lender.getAddress());
+
+            List<Transaction> transactions = new ArrayList<>(transactionRepository.findByLenderId(lender.getId()));
+            transactions.sort(Comparator.comparing(Transaction::getTransactionDate));
+            List<Map<String, Object>> txList = new ArrayList<>();
+            for (Transaction tx : transactions) {
+                Map<String, Object> txMap = new HashMap<>();
+                txMap.put("transactionDate", tx.getTransactionDate() != null ? tx.getTransactionDate().format(DATE_FORMATTER) : "");
+                txMap.put("transactionValue", tx.getTransactionValue());
+                txMap.put("transactionType", tx.getTransactionType());
+                txMap.put("transactionPaymentType", tx.getTransactionPaymentType());
+                txList.add(txMap);
+            }
+            lenderMap.put("transactions", txList);
+
+            List<TransactionHistory> history = new ArrayList<>(transactionHistoryRepository.findByLenderId(lender.getId()));
+            history.sort(Comparator.comparing(TransactionHistory::getHistoryDate));
+            List<Map<String, Object>> histList = new ArrayList<>();
+            for (TransactionHistory h : history) {
+                Map<String, Object> hMap = new HashMap<>();
+                hMap.put("historyDate", h.getHistoryDate() != null ? h.getHistoryDate().format(DATE_FORMATTER) : "");
+                hMap.put("transactionDate", h.getTransactionDate() != null ? h.getTransactionDate().format(DATE_FORMATTER) : "");
+                hMap.put("transactionValue", h.getTransactionValue());
+                hMap.put("transactionType", h.getTransactionType());
+                hMap.put("historyType", h.getHistoryType());
+                histList.add(hMap);
+            }
+            lenderMap.put("history", histList);
+
+            lenderData.add(lenderMap);
+        }
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("lenders", lenderData);
+        data.put("reportDate", LocalDate.now().format(DATE_FORMATTER));
+        return data;
+    }
+
+    public String getPdfFileName() {
+        String timestamp = LocalDateTime.now().format(FILE_NAME_FORMATTER);
+        return "personal_load_manager_" + timestamp + ".pdf";
     }
 }
