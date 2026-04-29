@@ -11,6 +11,8 @@ public interface TransactionHistoryRepository extends JpaRepository<TransactionH
 
     List<TransactionHistory> findByLenderId(UUID lenderId);
 
+    void deleteByHistoryDateBefore(LocalDateTime cutoffDate);
+
     default List<TransactionHistory> findByFilters(UUID lenderId, LocalDateTime startDate, LocalDateTime endDate,
                                                    BigDecimal minValue, BigDecimal maxValue, HistoryType type) {
         return findAll((root, query, cb) -> {

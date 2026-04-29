@@ -20,6 +20,8 @@ tags:
     description: Debt reporting operations
   - name: Reports
     description: Report generation operations
+  - name: History
+    description: History management operations
 
 paths:
   /codes/generate:
